@@ -128,9 +128,11 @@ details.meth li{margin-bottom:4px}
 .note b.blink{animation:pulse 2s ease-in-out 3;color:var(--bad)}
 input[type=range]::-webkit-slider-thumb{box-shadow:0 1px 4px var(--shadow)}
 .ac-list{box-shadow:0 6px 20px var(--shadow)}
-.mobile-hint{display:none;background:var(--warnbg);color:var(--warn);font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:12px;text-align:center;line-height:1.5}
+.mobile-hint{display:none!important;background:var(--warnbg);color:var(--warn);font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:12px;text-align:center;line-height:1.5}
 @media(max-width:640px){
-.mobile-hint{display:block}
+.mobile-hint.lang-nl{display:block!important}
+[data-lang="en"] .mobile-hint.lang-nl{display:none!important}
+[data-lang="en"] .mobile-hint.lang-en{display:block!important}
 .pg{padding:.75rem}
 .hdr{flex-direction:column;gap:4px}
 .hdr h1{font-size:20px}
