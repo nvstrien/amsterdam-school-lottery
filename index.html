@@ -303,6 +303,13 @@ details.meth{padding:10px 12px}
 <li><b>Year-on-year volatility</b> — School popularity fluctuates due to open days, media attention and word of mouth. The model extrapolates the 2025 ratios and does not capture trend breaks.</li>
 </ul>
 </details>
+
+<div class="note lang-nl" style="margin-top:12px">
+<b>Contact</b> — Vragen, suggesties of fouten gevonden? <a href="#" id="contactNl" onclick="revealEmail(this);return false" style="color:var(--acc);text-decoration:underline;cursor:pointer">Klik hier voor het e-mailadres</a>
+</div>
+<div class="note lang-en" style="margin-top:12px">
+<b>Contact</b> — Questions, suggestions or found an error? <a href="#" id="contactEn" onclick="revealEmail(this);return false" style="color:var(--acc);text-decoration:underline;cursor:pointer">Click here to reveal the email address</a>
+</div>
 </div>
 
 <!-- TOAST -->
@@ -1511,6 +1518,17 @@ function submitShareList(){
   fetch(SHARE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(r=>{if(r.ok)showToast('\u2713 Bedankt! Je lijst is anoniem gedeeld.');})
     .catch(()=>{});
+}
+
+// ================================================================
+// CONTACT (obfuscated to prevent scraping)
+// ================================================================
+function revealEmail(el){
+  var u='amsterdamschoollottery',d='proton',t='me';
+  var addr=u+'@'+d+'.'+t;
+  el.href='mailto:'+addr;
+  el.textContent=addr;
+  el.onclick=null;
 }
 
 // ================================================================
