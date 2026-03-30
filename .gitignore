@@ -2,3 +2,6 @@
 !.gitignore
 !LICENSE
 !index.html
+!package.json
+!api/
+!api/submit-list.js
