@@ -1443,7 +1443,7 @@ function applyPreset(idx){
   curAdvies=preset.advies;advSel.value=curAdvies;
   prefIds=[...preset.ids];
   listStartTime=Date.now();
-  tempCalibrated=false;shareConsent=null;
+  tempCalibrated=false;shareConsent=false; // don't share example lists
   closePresetModal();
   resetSim();renderAll();
 }
