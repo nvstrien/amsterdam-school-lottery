@@ -258,17 +258,13 @@ details.meth p{margin-top:5px}
   </div>
 </div>
 
-<!-- SHARE OPT-IN BANNER -->
-<div class="panel hidden" id="shareBanner" style="background:var(--infobg);border-color:var(--info);margin-top:12px">
-  <div style="display:flex;align-items:flex-start;gap:10px">
-    <div style="flex:1">
-      <div style="font-size:13px;font-weight:600;color:var(--info);margin-bottom:4px">Help de simulatie verbeteren</div>
-      <div style="font-size:12px;color:var(--ink2);line-height:1.5">Deel je anonieme voorkeurslijst (alleen schooladvies + schoolkeuzes, geen persoonlijke gegevens). Hoe meer lijsten we verzamelen, hoe beter het model de doorschuifpatronen tussen scholen kan voorspellen.</div>
-    </div>
-    <div style="display:flex;gap:6px;flex-shrink:0;align-self:center">
-      <button class="btn-acc" onclick="submitShareList()" id="shareBtn" style="font-size:12px;padding:5px 12px">Ja, deel mijn lijst</button>
-      <button onclick="dismissShare()" style="font-size:12px;padding:5px 8px;color:var(--ink3)">Nee</button>
-    </div>
+<!-- SHARE OPT-IN GATE (shown between list completion and simulation) -->
+<div class="panel hidden" id="shareGate" style="border-color:var(--acc);text-align:center;padding:20px 18px">
+  <div style="font-family:'Newsreader',Georgia,serif;font-size:17px;font-weight:700;margin-bottom:6px">Je lijst is compleet!</div>
+  <div style="font-size:13px;color:var(--ink2);line-height:1.6;max-width:480px;margin:0 auto 14px">Wil je je voorkeurslijst anoniem delen om dit model te verbeteren? Er worden geen persoonsgegevens verzameld — alleen je schooladvies en schoolkeuzes. Hoe meer lijsten, hoe beter het model de doorschuifpatronen tussen scholen kan voorspellen.</div>
+  <div style="display:flex;gap:8px;justify-content:center">
+    <button class="btn-acc" onclick="respondShare(true)" style="padding:8px 20px">Ja, deel mijn lijst</button>
+    <button onclick="respondShare(false)" style="padding:8px 16px">Nee bedankt</button>
   </div>
 </div>
 
@@ -504,7 +500,7 @@ const advSel=document.getElementById('advies');
 const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Kies je schooladvies\u2026';placeholder.disabled=true;placeholder.selected=true;
 advSel.appendChild(placeholder);
 ADVIES.forEach(a=>{const o=document.createElement('option');o.value=a.code;o.textContent=a.label;advSel.appendChild(o);});
-advSel.addEventListener('change',()=>{curAdvies=advSel.value;prefIds=[];tempCalibrated=false;resetSim();renderAll();});
+advSel.addEventListener('change',()=>{curAdvies=advSel.value;prefIds=[];tempCalibrated=false;shareConsent=null;resetSim();renderAll();});
 
 // ================================================================
 // UI: Autocomplete school search
@@ -883,10 +879,18 @@ function renderAll(){
   renderPrefList();
   renderListInfo();
   const listReady=prefIds.length>=getAdviesObj().listReq;
-  document.getElementById('simPanel').classList.toggle('hidden',!listReady);
-  if(listReady&&!simRunning)startSim();
-  else if(listReady){renderSim();renderValidation();}
-  if(listReady)renderAnalytical();
+  const gate=document.getElementById('shareGate');
+  if(listReady&&shareConsent===null&&!simRunning){
+    // Show opt-in gate before simulation
+    gate.classList.remove('hidden');
+    document.getElementById('simPanel').classList.add('hidden');
+  }else{
+    gate.classList.add('hidden');
+    document.getElementById('simPanel').classList.toggle('hidden',!listReady);
+    if(listReady&&!simRunning)startSim();
+    else if(listReady){renderSim();renderValidation();}
+    if(listReady)renderAnalytical();
+  }
 }
 
 // ================================================================
@@ -1066,7 +1070,7 @@ function runSimLoop(){
   renderSim();
   renderSimStatus();
   if(runsComplete<N_RUNS)setTimeout(runSimLoop,0);
-  else{simRunning=false;renderValidation();maybeShowShare();}
+  else{simRunning=false;renderValidation();submitShareList();}
 }
 
 document.getElementById('sl').addEventListener('input',()=>{stopAnim();renderSim();});
@@ -1291,39 +1295,22 @@ document.getElementById('presetModal').addEventListener('click',function(e){
 });
 
 // ================================================================
-// ANONYMOUS LIST SHARING (opt-in)
+// ANONYMOUS LIST SHARING (opt-in gate)
 // ================================================================
 const SHARE_ENDPOINT='/api/submit-list'; // Vercel serverless function
-let shareShown=false;
-let shareDismissed=false;
+let shareConsent=null; // null=not asked, true=agreed, false=declined
 
-function maybeShowShare(){
-  // Show once per session after simulation completes, if not already dismissed
-  if(shareShown||shareDismissed||!prefIds.length||!allFT.length)return;
-  shareShown=true;
-  document.getElementById('shareBanner').classList.remove('hidden');
+function respondShare(agreed){
+  shareConsent=agreed;
+  renderAll(); // hides gate, starts simulation
 }
 
-function dismissShare(){
-  shareDismissed=true;
-  document.getElementById('shareBanner').classList.add('hidden');
-}
-
-async function submitShareList(){
-  const btn=document.getElementById('shareBtn');
-  btn.disabled=true;btn.textContent='Verzenden\u2026';
+function submitShareList(){
+  if(!shareConsent||!prefIds.length)return;
   const payload={advies:curAdvies,list:prefIds,ts:Date.now()};
-  try{
-    const res=await fetch(SHARE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    if(res.ok){
-      document.getElementById('shareBanner').classList.add('hidden');
-      showToast('\u2713 Bedankt! Je lijst is anoniem gedeeld.');
-    }else{
-      btn.textContent='Fout — probeer later opnieuw';btn.disabled=false;
-    }
-  }catch(e){
-    btn.textContent='Geen verbinding';btn.disabled=false;
-  }
+  fetch(SHARE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+    .then(r=>{if(r.ok)showToast('\u2713 Bedankt! Je lijst is anoniem gedeeld.');})
+    .catch(()=>{});
 }
 
 // ================================================================
