@@ -23,8 +23,8 @@ module.exports = async function handler(req, res) {
   const keys = sessionIds.map(id => `list:${id}`);
   const values = await db.mget(...keys);
 
-  const lists = values
-    .map(v => { try { return JSON.parse(v); } catch (e) { return null; } })
+  const lists = sessionIds
+    .map((id, i) => { try { const d = JSON.parse(values[i]); d.sessionId = id; return d; } catch (e) { return null; } })
     .filter(Boolean);
 
   return res.status(200).json({ count: lists.length, lists });
