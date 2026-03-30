@@ -128,9 +128,36 @@ details.meth li{margin-bottom:4px}
 .note b.blink{animation:pulse 2s ease-in-out 3;color:var(--bad)}
 input[type=range]::-webkit-slider-thumb{box-shadow:0 1px 4px var(--shadow)}
 .ac-list{box-shadow:0 6px 20px var(--shadow)}
-@media(max-width:640px){.pg{padding:1rem}.hdr h1{font-size:22px}.stats{grid-template-columns:repeat(2,1fr)}.col-ref{display:none}.lot-num{font-size:28px}}
+.mobile-hint{display:none;background:var(--warnbg);color:var(--warn);font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:12px;text-align:center;line-height:1.5}
+@media(max-width:640px){
+.mobile-hint{display:block}
+.pg{padding:.75rem}
+.hdr{flex-direction:column;gap:4px}
+.hdr h1{font-size:20px}
+.hdr .sub{font-size:13px}
+.hdr-controls{align-self:flex-end;margin-top:-28px}
+.panel{padding:12px 14px}
+.actions{gap:4px}.actions button{font-size:12px;padding:4px 8px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.s{padding:10px 12px}
+.s-val{font-size:18px}
+.slider-top{flex-wrap:wrap;gap:6px}
+.lot-num{font-size:26px}
+.anim-btns{margin-left:0;margin-top:2px}
+.col-ref{display:none}
+.col-nm{max-width:120px;font-size:13px}
+.bar-c{min-width:100px}
+.bt{width:50px}
+.pref-name{font-size:13px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{min-width:480px}
+details.meth{padding:10px 12px}
+.modal{padding:16px;max-width:95%}
+}
 </style></head><body>
 <div class="pg">
+<div class="mobile-hint lang-nl">Deze tool werkt het best op een groter scherm (tablet of computer). Op een telefoon kun je de tool gebruiken, maar de tabellen en grafieken zijn beter leesbaar op een breder scherm.</div>
+<div class="mobile-hint lang-en">This tool works best on a larger screen (tablet or computer). You can use it on a phone, but the tables and charts are easier to read on a wider screen.</div>
 <div class="hdr">
   <div class="hdr-text">
     <h1 data-i18n="title">Centrale Loting & Matching 2026–2027</h1>
