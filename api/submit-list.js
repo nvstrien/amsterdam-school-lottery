@@ -1,4 +1,10 @@
-const { kv } = require('@vercel/kv');
+const Redis = require('ioredis');
+
+let redis;
+function getRedis() {
+  if (!redis) redis = new Redis(process.env.REDIS_URL);
+  return redis;
+}
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -24,11 +30,13 @@ module.exports = async function handler(req, res) {
     ts: ts || Date.now()
   };
 
+  const db = getRedis();
+
   // Store with sessionId as key (auto-dedup: re-submission overwrites)
-  await kv.set(`list:${sessionId}`, entry);
+  await db.set(`list:${sessionId}`, JSON.stringify(entry));
 
   // Track session ID for enumeration
-  await kv.sadd('sessions', sessionId);
+  await db.sadd('sessions', sessionId);
 
   return res.status(200).json({ ok: true });
 };
