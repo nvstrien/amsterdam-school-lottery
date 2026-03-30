@@ -120,7 +120,7 @@ details.meth p{margin-top:5px}
 <div class="pg">
 <div class="hdr">
   <h1>Centrale Loting & Matching 2026–2027</h1>
-  <div class="sub">Interactieve simulatie — schat je plaatsingskansen</div>
+  <div class="sub">Stel je voorkeurslijst samen en simuleer de loting om je plaatsingskansen per school te schatten</div>
 </div>
 
 <!-- ADVIES + ACTIONS -->
@@ -130,9 +130,9 @@ details.meth p{margin-top:5px}
     <select id="advies" class="advies-sel"></select>
     <div style="flex:1"></div>
     <div class="actions">
-      <button onclick="saveList()" title="Opslaan">💾 Opslaan</button>
-      <button onclick="loadList()" title="Laden">📂 Laden</button>
-      <button onclick="loadPreset()" title="Voorbeeldlijst laden">📋 Voorbeeld</button>
+      <button onclick="saveList()" title="Sla je huidige voorkeurslijst op zodat je later verder kunt">💾 Opslaan</button>
+      <button onclick="loadList()" title="Laad een eerder opgeslagen voorkeurslijst">📂 Laden</button>
+      <button onclick="loadPreset()" title="Laad een voorbeeldlijst om de simulatie te verkennen">📋 Voorbeeld</button>
     </div>
   </div>
 </div>
@@ -1044,6 +1044,7 @@ function renderSimStatus(){
     txt.textContent=`\u2713 ${N_RUNS.toLocaleString('nl-NL')} iteraties voltooid (T=${calibratedTemp.toFixed(2)})`;
     const btn=document.createElement('button');
     btn.className='btn-sm';btn.style.marginLeft='8px';btn.textContent='Herkalibreren';
+    btn.title='Kalibreer het model opnieuw tegen de 2025-data. Dit duurt ~30 seconden maar kan de nauwkeurigheid verbeteren.';
     btn.onclick=recalibrate;
     stEl.append(txt,btn);
   }
@@ -1246,7 +1247,7 @@ function applyLoadText(){
     const cfg=JSON.parse(txt);
     if(!cfg.list||!Array.isArray(cfg.list)){setStatus('loadStatus','err','Ongeldig formaat: "list" array ontbreekt.');return;}
     curAdvies=cfg.advies||'h';advSel.value=curAdvies;
-    prefIds=cfg.list;tempCalibrated=false;
+    prefIds=cfg.list;listStartTime=Date.now();tempCalibrated=false;shareConsent=null;
     closeLoadModal();resetSim();renderAll();
     showToast('✓ Lijst geladen ('+prefIds.length+' scholen)');
   }catch(e){setStatus('loadStatus','err','Ongeldige JSON. Controleer of je de volledige tekst hebt geplakt.');}
@@ -1282,7 +1283,8 @@ function applyPreset(idx){
   const preset=PRESETS[idx];if(!preset)return;
   curAdvies=preset.advies;advSel.value=curAdvies;
   prefIds=[...preset.ids];
-  tempCalibrated=false;
+  listStartTime=Date.now();
+  tempCalibrated=false;shareConsent=null;
   closePresetModal();
   resetSim();renderAll();
 }
