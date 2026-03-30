@@ -1,0 +1,1279 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,500;0,6..72,700;1,6..72,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1d24;--ink2:#4a4f5c;--ink3:#8b91a0;--ink4:#b8bcc8;--bg:#f6f5f1;--card:#fff;--inset:#edece7;--brd:#dddbd4;--brd2:#eae8e2;--acc:#c4651a;--acc2:#e8985a;--good:#2d7a3a;--goodbg:#e8f5ea;--warn:#9e6b15;--warnbg:#fdf3e0;--bad:#b33b3b;--badbg:#fce8e8;--info:#2565a0;--infobg:#e3f0fc}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',system-ui,sans-serif;font-size:14px;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+.pg{max-width:820px;margin:0 auto;padding:1.5rem 1.25rem 3rem}
+.hdr{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--ink)}
+.hdr h1{font-family:'Newsreader',Georgia,serif;font-weight:700;font-size:24px;letter-spacing:-.02em;line-height:1.2}
+.hdr .sub{font-family:'Newsreader',Georgia,serif;font-weight:300;font-style:italic;font-size:14px;color:var(--ink2);margin-top:4px}
+.panel{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:16px 18px;margin-bottom:12px}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary::after{content:'';border:5px solid transparent;border-top:6px solid var(--ink3);display:inline-block;margin-left:6px;transition:transform .2s}
+details.panel[open]>summary::after{transform:rotate(180deg)}
+.panel-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,button{font-family:inherit;font-size:13px;border-radius:6px;border:1px solid var(--brd);padding:6px 10px;background:var(--card);color:var(--ink);cursor:pointer;transition:border-color .15s}
+select:focus,button:focus{outline:none;border-color:var(--acc)}
+button:hover{background:var(--inset)}
+.btn-acc{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:500}
+.btn-acc:hover{background:#b35a16}
+.btn-sm{padding:3px 7px;font-size:11px;min-width:26px}
+.btn-danger{color:var(--bad);border-color:var(--badbg)}
+.btn-danger:hover{background:var(--badbg)}
+.advies-sel{font-weight:500;font-size:14px;padding:8px 12px}
+.add-row{position:relative;margin-bottom:10px}
+.ac-input{width:100%;font-family:inherit;font-size:13px;border-radius:6px;border:1px solid var(--brd);padding:8px 12px;background:var(--card);color:var(--ink);transition:border-color .15s}
+.ac-input:focus{outline:none;border-color:var(--acc)}
+.ac-input::placeholder{color:var(--ink4)}
+.ac-list{position:absolute;top:100%;left:0;right:0;z-index:100;max-height:260px;overflow-y:auto;background:var(--card);border:1px solid var(--brd);border-top:none;border-radius:0 0 8px 8px;box-shadow:0 6px 20px rgba(0,0,0,.1);display:none}
+.ac-list.open{display:block}
+.ac-item{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .1s}
+.ac-item:hover,.ac-item.ac-active{background:var(--inset)}
+.ac-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-item-meta{font-size:11px;color:var(--ink3);flex-shrink:0}
+.ac-empty{padding:12px;text-align:center;font-size:12px;color:var(--ink4)}
+.list-empty{text-align:center;padding:24px 12px;color:var(--ink4);font-size:13px;line-height:1.5}
+.pref-item{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;margin-bottom:3px;background:var(--bg);transition:background .1s}
+.pref-item:hover{background:var(--inset)}
+.pref-rk{font-weight:600;color:var(--ink3);font-size:12px;min-width:20px;text-align:center}
+.pref-name{flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pref-cap{font-size:11px;color:var(--ink3);font-variant-numeric:tabular-nums;min-width:32px;text-align:right}
+.pref-btns{display:flex;gap:2px}
+.list-info{font-size:11px;color:var(--ink3);margin-top:6px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.list-info .ok{color:var(--good)}.list-info .nok{color:var(--bad)}
+.tag{display:inline-block;font-size:8px;font-weight:600;padding:1px 4px;border-radius:3px;margin-left:3px;vertical-align:middle;text-transform:uppercase;letter-spacing:.2px}
+.tag-hot{background:var(--badbg);color:var(--bad)}.tag-ok{background:var(--goodbg);color:var(--good)}.tag-int{background:var(--infobg);color:var(--info)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--brd);border:1px solid var(--brd);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.s{background:var(--card);padding:12px 14px}
+.s-val{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.s-lbl{font-size:10px;color:var(--ink3);margin-top:2px}
+.c-good{color:var(--good)}.c-warn{color:var(--warn)}.c-bad{color:var(--bad)}.c-mut{color:var(--ink4)}
+.slider-section{margin-bottom:12px}
+.slider-top{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.lot-label{font-size:11px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px}
+.lot-num{font-family:'Newsreader',Georgia,serif;font-size:32px;font-weight:700;color:var(--acc);line-height:1;font-variant-numeric:tabular-nums}
+.lot-desc{font-size:12px;color:var(--ink3)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:linear-gradient(to right,var(--good),var(--acc2),var(--bad));border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--card);border:3px solid var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.15);cursor:grab}
+.slider-axis{display:flex;justify-content:space-between;font-size:10px;color:var(--ink4);padding:3px 2px 0}
+.sim-status{font-size:11px;color:var(--ink4);text-align:right;margin-top:4px;display:flex;align-items:center;justify-content:flex-end;gap:6px;min-height:18px}
+.sim-status.busy{color:var(--acc);font-weight:500}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:14px;height:14px;border:2px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+.spinner-lg{width:22px;height:22px;border-width:2.5px}
+.progress-wrap{width:100%;height:4px;background:var(--inset);border-radius:2px;overflow:hidden;margin-top:6px}
+.progress-bar{height:100%;background:var(--acc);border-radius:2px;transition:width .15s ease-out}
+.loading-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px}
+.loading-label{font-size:12px;color:var(--ink3);font-weight:500}
+.loading-detail{font-size:10px;color:var(--ink4)}
+.tw{border:1px solid var(--brd);border-radius:10px;overflow:hidden;background:var(--card)}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:9px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;padding:8px 10px 6px;border-bottom:2px solid var(--brd);text-align:left;white-space:nowrap;background:var(--inset)}
+thead th.r{text-align:right}
+tbody tr{transition:background .1s}tbody tr:hover{background:#faf9f6}
+tbody td{padding:6px 10px;border-top:1px solid var(--brd2);vertical-align:middle;font-size:12px}
+.col-rk{width:24px;text-align:center;font-weight:600;color:var(--ink4);font-size:11px}
+.col-nm{font-weight:500;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.col-n{text-align:right;font-variant-numeric:tabular-nums;font-size:11px;color:var(--ink2)}
+.bar-c{min-width:140px;padding-left:6px}
+.bw{display:flex;align-items:center;gap:6px}
+.bt{width:72px;height:7px;background:var(--inset);border-radius:4px;overflow:hidden;flex-shrink:0}
+.bf{height:100%;border-radius:4px}
+.bp{font-weight:600;font-variant-numeric:tabular-nums;font-size:12px;min-width:38px;text-align:right}
+.row-top td{background:#fdfcf8}
+.note{font-size:11px;color:var(--ink3);margin-top:10px;line-height:1.6}
+.note b{color:var(--ink2);font-weight:500}
+details.meth{background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.6;color:var(--ink3)}
+details.meth summary{font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+details.meth p{margin-top:5px}
+.hidden{display:none!important}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-bg.open{opacity:1;pointer-events:auto}
+.modal{background:var(--card);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:20px 22px;max-width:480px;width:92%;max-height:80vh;overflow-y:auto;transform:translateY(12px);transition:transform .2s}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal h2{font-family:'Newsreader',Georgia,serif;font-size:18px;font-weight:700;margin-bottom:4px}
+.modal .sub{font-size:12px;color:var(--ink3);margin-bottom:14px}
+.preset-btn{display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;border-radius:8px;border:1px solid var(--brd);background:var(--bg);cursor:pointer;transition:border-color .15s,background .15s}
+.preset-btn:hover{border-color:var(--acc);background:var(--card)}
+.preset-btn .p-label{font-weight:600;font-size:13px;margin-bottom:2px}
+.preset-btn .p-schools{font-size:11px;color:var(--ink3);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preset-btn .p-advies{font-size:10px;color:var(--acc);font-weight:500;margin-bottom:1px}
+.modal-close{float:right;background:none;border:none;font-size:18px;color:var(--ink3);cursor:pointer;padding:0 4px;line-height:1}
+.modal-close:hover{color:var(--ink)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:1100;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.modal textarea{width:100%;min-height:80px;font-family:'Outfit',monospace;font-size:11px;padding:10px;border:1px solid var(--brd);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical;margin-bottom:10px}
+.modal textarea:focus{outline:none;border-color:var(--acc)}
+.modal .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.modal .status-msg{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:6px;display:none}
+.modal .status-msg.ok{display:block;background:var(--goodbg);color:var(--good)}
+.modal .status-msg.err{display:block;background:var(--badbg);color:var(--bad)}
+.modal .status-msg.info{display:block;background:var(--infobg);color:var(--info)}
+.anim-btns{display:flex;gap:3px;margin-left:auto}
+.anim-label{font-size:12px;font-weight:500;color:var(--acc);padding:5px 0 0;min-height:20px;opacity:0;transition:opacity .3s}
+.anim-label.visible{opacity:1}
+@media(max-width:640px){.pg{padding:1rem}.hdr h1{font-size:20px}.stats{grid-template-columns:repeat(2,1fr)}.col-ref{display:none}.lot-num{font-size:26px}}
+</style></head><body>
+<div class="pg">
+<div class="hdr">
+  <h1>Centrale Loting & Matching 2026–2027</h1>
+  <div class="sub">Interactieve simulatie — schat je plaatsingskansen</div>
+</div>
+
+<!-- ADVIES + ACTIONS -->
+<div class="panel">
+  <div class="panel-title">Schooladvies</div>
+  <div class="row">
+    <select id="advies" class="advies-sel"></select>
+    <div style="flex:1"></div>
+    <div class="actions">
+      <button onclick="saveList()" title="Opslaan">💾 Opslaan</button>
+      <button onclick="loadList()" title="Laden">📂 Laden</button>
+      <button onclick="loadPreset()" title="Voorbeeldlijst laden">📋 Voorbeeld</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREFERENCE LIST BUILDER -->
+<details class="panel" id="prefPanel" open>
+  <summary class="panel-title" style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">Jouw voorkeurslijst <span id="prefCount" style="font-weight:400;color:var(--ink4)"></span></summary>
+  <div class="add-row" style="margin-top:10px">
+    <input type="text" id="schoolInput" class="ac-input" placeholder="Zoek en voeg een school toe…" autocomplete="off">
+    <div class="ac-list" id="acList"></div>
+  </div>
+  <div id="prefList"></div>
+  <div class="list-info" id="listInfo"></div>
+</details>
+
+<!-- SIMULATION RESULTS -->
+<div id="simPanel" class="hidden">
+  <div class="stats" id="statsGrid"></div>
+  <div class="panel slider-section">
+    <div class="slider-top">
+      <span class="lot-label">Lotnummer</span>
+      <span class="lot-num" id="lv">3.825</span>
+      <span class="lot-desc" id="ls">mediaan</span>
+      <div class="anim-btns">
+        <button class="btn-sm" id="animPrev" title="Vorige overgang">◀</button>
+        <button class="btn-sm" id="animPlay" title="Afspelen" style="min-width:32px">▶</button>
+        <button class="btn-sm" id="animNext" title="Volgende overgang">▶</button>
+      </div>
+    </div>
+    <input type="range" min="1" max="7650" value="3825" step="1" id="sl">
+    <div class="anim-label" id="animLabel"></div>
+    <div class="slider-axis"><span>1 — gunstigst</span><span>3.825</span><span>7.650 — ongunstigst</span></div>
+    <div class="sim-status" id="st"></div>
+  </div>
+  <div class="tw"><table><thead><tr>
+    <th style="width:24px">#</th><th>School</th><th class="r" style="width:36px">Cap</th>
+    <th style="min-width:140px;padding-left:6px">Plaatsingskans</th><th class="r" style="width:36px">Cum</th>
+  </tr></thead><tbody id="tb"></tbody></table></div>
+  <div class="note" id="simNote" style="display:none"><b>&plusmn;</b> = weinig historische data (< 5 eerstevoorkeuren) — schatting is indicatief. <b>~</b> = onzekere kansschatting.</div>
+  <div id="analyticalPanel"></div>
+  <div id="validationPanel"></div>
+</div>
+
+<div class="note" style="margin-top:14px">
+<b>Disclaimer</b> — Dit is een indicatief simulatiemodel op basis van publieke data (L&M 2025-verslag, capaciteitsopgave 2026). De werkelijke uitkomst hangt af van de voorkeurslijsten van alle ~7.650 deelnemers, die pas in april 2026 bekend zijn. Gebruik deze tool als richtlijn, niet als voorspelling.
+</div>
+
+<details class="meth">
+<summary>Hoe werkt deze simulatie?</summary>
+<p style="margin-top:8px"><b>In het kort</b> — Deze tool simuleert de Amsterdamse schoolloting duizenden keren om te schatten hoe groot jouw kans is op elke school in je voorkeurslijst.</p>
+<p>Bij de echte loting krijgt elk kind een willekeurig lotnummer. Kinderen worden op volgorde van dat nummer verwerkt: het kind met nummer 1 mag als eerste naar de school van eerste voorkeur, dan nummer 2, enzovoort. Als een school vol zit, schuift het kind automatisch door naar de volgende school op de lijst.</p>
+<p>Niemand weet van tevoren welke scholen de andere ~7.650 kinderen kiezen. Daarom maakt deze tool <b>nep-voorkeurslijsten</b> aan voor alle andere kinderen, op basis van de populariteit van scholen in 2025 (hoeveel kinderen een school als 1e, 2e of 3e voorkeur kozen). Vervolgens wordt de loting gesimuleerd: iedereen krijgt een willekeurig nummer, en het systeem verwerkt alle kinderen op volgorde.</p>
+<p>Dit doen we <b>2.500 keer</b>. Door te tellen hoe vaak jij bij elke school terechtkomt, krijgen we een betrouwbare schatting van je plaatsingskansen. Met de lotnummer-slider kun je zien hoe je kansen veranderen bij een gunstig of ongunstig nummer.</p>
+<p style="margin-top:6px"><b>Wat kan deze tool niet?</b></p>
+<ul style="margin:6px 0 0 18px;line-height:1.7">
+<li><b>Woonplaats en basisschool</b> — In werkelijkheid kiezen kinderen uit Noord vaker scholen in Noord, en kinderen uit Zuid vaker scholen in Zuid. Deze tool weet niet waar de andere kinderen wonen en doet alsof iedereen uit dezelfde "pot" kiest. Daardoor kan de concurrentie voor buurtscholen in de praktijk hoger of lager uitvallen dan hier getoond.</li>
+<li><b>"Doorschuifscholen" worden onderschat</b> — Sommige scholen vullen zich in de praktijk grotendeels met kinderen die zijn afgewezen bij populairdere scholen in dezelfde buurt. Bijvoorbeeld: een kind dat Fons Vitae als 1e en Spinoza als 2e kiest, zet vaak Berlage Tweetalig op plek 5 — omdat die ook in Zuid ligt. Deze tool weet niet welke scholen samen op lijstjes staan en verdeelt de doorschuivers gelijkmatig over alle scholen. Het gevolg: scholen die in werkelijkheid vol raken via doorschuivers (bijv. Berlage Tweetalig, Havo de Hof) worden in de simulatie soms als "onderbezet" getoond terwijl ze in de praktijk wél vol raken.</li>
+<li><b>Open dagen en reputatie</b> — Een succesvolle open dag of een veranderde reputatie kan ervoor zorgen dat een school in 2026 veel populairder (of juist minder populair) is dan in 2025. De tool gaat uit van de verhoudingen van vorig jaar.</li>
+<li><b>Voorkeuren voorbij plek 3</b> — Van de echte loting is alleen bekend hoeveel kinderen een school als 1e, 2e of 3e voorkeur kozen. Wat kinderen op plek 4 t/m 12 zetten is onbekend — de tool genereert die posities zelf op basis van populariteit. Dit is de grootste bron van onzekerheid, vooral voor scholen die bijna volledig via plek 4 of lager vol raken.</li>
+<li><b>Kleine afdelingen</b> — Scholen met weinig plekken (bijv. DENISE met 12 plaatsen) zijn gevoeliger voor toeval. Een klein verschil in voorkeuren kan daar een groot effect hebben op je kans. Deze worden gemarkeerd met <b>&plusmn;</b>.</li>
+<li><b>Voorlopige capaciteit</b> — De 2026-capaciteiten zijn op basis van de capaciteitsopgave en kunnen nog wijzigen na de proefmatching in april 2026.</li>
+</ul>
+<p style="margin-top:8px">Gebruik de uitkomsten daarom als <b>richtlijn</b> bij het samenstellen van je lijst, niet als exacte voorspelling.</p>
+</details>
+
+<details class="meth" style="margin-top:6px">
+<summary>Technische methode — Monte Carlo DA-STB simulatie</summary>
+<p style="margin-top:8px">Per iteratie worden synthetische leerlingen gegenereerd met voorkeurslijsten via een Plackett-Luce model. De aantrekkelijkheid van elke afdeling wordt gekalibreerd op een gewogen combinatie van voorkeur 1, 2 en 3 uit het L&M 2025-verslag, Tabel 17 (gewichten 0,6 / 0,25 / 0,15). Voorkeur 1 weegt het zwaarst (meest betrouwbaar signaal), terwijl voorkeur 2-3 het "vangneteffect" van populaire reservescholen meeneemt. Een temperatuurparameter wordt automatisch gekalibreerd per adviestype (twee-fasen zoekmethode: grof raster + gulden-snede verfijning, gevalideerd tegen 2025-plaatsingsdata) om heterogeniteit in voorkeuren te modelleren (stadsdeel, denominatie, open dagen) die niet uit de geaggregeerde data blijkt. Per adviestype worden realistische lijstlengtes gehanteerd: 12 voor havo/vwo, 6 voor vmbo-gl-tl, 4 voor vmbo-kader/basis.</p>
+<p>Alle leerlingen worden op lotnummervolgorde verwerkt volgens het DA-STB algoritme (Deferred Acceptance met Single Tie Breaking). Per run registreert het model het exacte moment (fillTime) waarop elke afdeling volraakt. De slider evalueert elk lotnummer exact over 2.500 iteraties. De analytische controle extrapoleert de bekende voorkeur 1-2-3 naar diepere posities om een onafhankelijke vulsnelheidsschatting te bieden.</p>
+<p style="margin-top:6px"><b>Beperkingen (technisch):</b></p>
+<ul style="margin:4px 0 0 18px;line-height:1.7">
+<li><b>Homogene voorkeuren</b> — Het Plackett-Luce model veronderstelt dat alle leerlingen binnen een adviestype uit dezelfde kansverdeling trekken. In werkelijkheid zijn voorkeuren heterogeen: een gezin in Nieuw-West heeft een andere verdeling dan een gezin in Oost. Een mixture-model zou dit beter vatten, maar de publieke data bevat geen uitsplitsing per stadsdeel of basisschool om zo'n model te kalibreren.</li>
+<li><b>Onbekende diepe voorkeuren en cascade-concentratie</b> — Alleen voorkeur 1, 2 en 3 zijn gepubliceerd (L&M 2025, Tabel 17). Posities 4–12 worden door het Plackett-Luce model gegenereerd. De werkelijke correlatie tussen diepe voorkeuren (bijv. "wie Fons Vitae op 1 zet, kiest vaak Berlage Tweetalig op 5") is niet waarneembaar uit de geaggregeerde data. Dit leidt tot een systematische onderschatting van de vulgraad van scholen die grotendeels via cascade vol raken. In 2025 vulde Berlage Tweetalig (havo) 48% van de plekken via voorkeur 4 of dieper; het model kan deze geconcentreerde cascade niet reproduceren omdat het de doorschuivers gelijkmatig over alle afdelingen verdeelt in plaats van in geografisch samenhangende clusters.</li>
+<li><b>Geen cross-pool interactie</b> — Afdelingen die toegankelijk zijn voor meerdere adviestypen (bijv. een afdeling met toegang havo + vmbo-tl/havo) worden per pool apart gesimuleerd. In werkelijkheid concurreren leerlingen uit verschillende adviespools om dezelfde plekken. Voor afdelingen met brede toegangscodes is dit een onderschatting van de concurrentie.</li>
+<li><b>Geen intake-simulatie</b> — Intake-procedures (bijv. dans, sport) zijn niet gemodelleerd. Intake-afdelingen zijn wel gemarkeerd maar niet gesimuleerd met aparte selectie.</li>
+<li><b>Kleine afdelingen</b> — Afdelingen met minder dan ~15 eerstevoorkeuren hebben weinig statistisch signaal om de aantrekkelijkheid betrouwbaar te schatten. De modelonzekerheid is hier groter; resultaten worden gemarkeerd met <b>&plusmn;</b>.</li>
+<li><b>Voorlopige capaciteit</b> — De gebruikte capaciteiten zijn gebaseerd op de capaciteitsopgave 2026. De definitieve capaciteit wordt vastgesteld na de proefmatching (april 2026) en kan afwijken.</li>
+<li><b>Jaar-op-jaar volatiliteit</b> — Populariteit van scholen fluctueert door open dagen, media-aandacht en mond-tot-mondreclame. Het model extrapoleert de verhoudingen van 2025 en vangt geen trendbreuken op.</li>
+</ul>
+</details>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SAVE MODAL -->
+<div class="modal-bg" id="saveModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSaveModal()">✕</button>
+    <h2>Lijst opslaan</h2>
+    <div class="sub">Kopieer onderstaande tekst om je lijst later terug te laden.</div>
+    <textarea id="saveText" readonly></textarea>
+    <div class="btn-row">
+      <button class="btn-acc" onclick="copySaveText()">📋 Kopieer naar klembord</button>
+      <button onclick="doStorageSave()">💾 Opslaan in browser</button>
+    </div>
+    <div class="status-msg" id="saveStatus"></div>
+  </div>
+</div>
+
+<!-- LOAD MODAL -->
+<div class="modal-bg" id="loadModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLoadModal()">✕</button>
+    <h2>Lijst laden</h2>
+    <div class="sub">Plak een eerder opgeslagen configuratie, of laad vanuit browser-opslag.</div>
+    <textarea id="loadText" placeholder='Plak hier je opgeslagen JSON…'></textarea>
+    <div class="btn-row">
+      <button class="btn-acc" onclick="applyLoadText()">📂 Laden uit tekstveld</button>
+      <button onclick="doStorageLoad()">💾 Laden uit browser</button>
+    </div>
+    <div class="status-msg" id="loadStatus"></div>
+  </div>
+</div>
+
+<!-- PRESET MODAL -->
+<div class="modal-bg" id="presetModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closePresetModal()">✕</button>
+    <h2>Voorbeeldlijst laden</h2>
+    <div class="sub">Kies een voorbeeldlijst om de simulatie te verkennen. Je huidige lijst wordt vervangen.</div>
+    <div id="presetButtons"></div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// DEPARTMENT DATA — pipe-delimited for compactness
+// Format: id|name|cap26|access_codes|v1|v2|v3|intake|g25|n1|n2|n3|n4p|cap25
+// access codes: b,bk,k,kt,t,th,h,hw,v
+// ================================================================
+const RAW=`
+0|Alasca|59|h,hw|46|34|46|0|59|36|12|2|9|57
+1|Alasca|59|v|28|30|38|0|57|28|14|6|9|57
+2|AB Noorderlicht|150|b,bk,k,kt,t|86|88|38|0|91|86|5|0|0|150
+3|Barlaeus Gymnasium|140|v|254|222|180|0|146|138|6|1|1|140
+4|Berlage Tweetalig|75|t,th|69|103|97|0|75|56|16|3|0|72
+5|Berlage Tweetalig|56|v|18|32|41|0|50|19|9|5|17|56
+6|Berlage Tweetalig|84|h,hw|26|46|69|0|88|21|12|13|42|84
+7|Berlage My World Class|28|h,hw,v|16|22|31|0|29|12|5|4|8|28
+8|Bernard Nieuwentijt|60|h,hw,v|5|5|7|0|8|5|2|1|0|50
+9|Bernard Nieuwentijt|60|t,th|9|11|10|0|11|9|2|0|0|50
+10|Bindelmeer Havo-pot.|24|t,th,h|11|14|10|0||||||0
+11|Bindelmeer College|96|b,bk,k,kt,t|17|58|47|0|30|17|13|0|0|120
+12|Bredero|175|t,th,h,hw|79|57|59|0|82|79|2|1|0|150
+13|Calandlyceum Technasium|28|h,hw,v|7|10|14|0|10|7|3|0|0|24
+14|Calandlyceum Topsport|56|t,th,h,hw,v|16|5|5|1|16|16|0|0|0|48
+15|Calandlyceum|84|h,hw|21|32|49|0|26|21|4|0|1|72
+16|Calandlyceum|112|t,th|53|40|88|0|73|53|10|5|5|96
+17|Calandlyceum|28|v|10|9|20|0|11|10|0|0|1|24
+18|Calvijn College|145|b,bk,k,kt,t|141|113|89|0|144|141|3|0|0|145
+19|Cartesius De Plaats|25|h,hw|8|14|8|0|10|8|1|0|1|25
+20|Cartesius De Plaats|25|v|1|4|5|0|1|1|0|0|0|25
+21|Cartesius Het Lyceum|100|h,hw|36|31|68|0|77|36|14|8|19|128
+22|Cartesius Het Lyceum|40|v|21|26|32|0|30|21|5|2|2|40
+23|Cburg College|90|b,bk,k,kt|55|63|70|0|56|55|1|0|0|100
+24|Cburg College|23|t,th|10|10|15|0||||||0
+25|College De Meer Havo-pot.|20|t,th|11|14|10|0|14|11|2|0|1|20
+26|College De Meer|95|b,bk,k,kt|70|81|99|0|73|70|3|0|0|95
+27|College De Meer|35|t,th|12|11|32|0|14|12|0|1|1|35
+28|College ZUYD Danstalent|22|b,bk,k,kt,t,th|20|1|0|1|20|20|0|0|0|22
+29|College ZUYD|36|b,bk|40|40|41|0|40|40|0|0|0|42
+30|College ZUYD|48|k,kt|47|49|56|0|48|47|1|0|0|48
+31|College ZUYD Havo-pot.|24|t,th|12|17|11|0||||||0
+32|Comenius Lyceum|78|h,hw|131|99|62|0|89|82|1|0|6|85
+33|Comenius Lyceum|44|t,th|150|144|92|0|44|44|0|0|0|44
+34|Comenius Lyceum|78|v|66|45|22|0|71|66|1|3|1|71
+35|Cornelius Haga Lyceum|80|h,hw|16|16|16|0|21|16|5|0|0|80
+36|Cornelius Haga Lyceum|80|t,th|41|22|17|0|52|41|10|1|0|80
+37|Cornelius Haga Lyceum|40|v|15|4|7|0|16|15|1|0|0|40
+38|CSB|119|h,hw,v|33|32|60|0|109|33|14|9|53|119
+39|CSB|79|t,th|52|61|76|0|79|51|12|9|7|79
+40|Cygnus gymnasium|140|v|152|119|123|0|175|125|22|16|12|168
+41|Damstede|112|h,hw|40|20|25|0|44|40|2|0|2|112
+42|Damstede|56|v|10|11|3|0|14|10|3|0|1|56
+43|De Amsterdamse MAVO|71|t,th|50|42|43|0|72|50|11|4|7|72
+44|DENISE|12|h,hw|4|10|15|0|10|4|2|0|4|14
+45|DENISE|6|t,th|15|22|20|0|3|3|0|0|0|3
+46|DENISE|4|v|2|3|2|0|3|2|0|0|1|4
+47|Fiducie College|75|h|3|7|7|0|4|3|1|0|0|3
+48|Fiducie College|100|t,th|19|19|12|0|25|19|6|0|0|19
+49|Fons Vitae Lyceum|84|h,hw|156|180|213|0|90|75|13|2|0|84
+50|Fons Vitae Lyceum|84|v|110|160|207|0|87|62|18|6|1|84
+51|Futuris|50|b,bk,k,kt,t,th|44|46|64|0|47|44|2|0|1|50
+52|Geert Groote College|58|h,hw|43|52|47|0|64|32|14|7|11|58
+53|Geert Groote College|56|t,th|51|85|90|0|58|39|13|2|4|56
+54|Geert Groote College|60|v|22|23|17|0|47|22|7|2|16|58
+55|Gerrit v/d Veen DaMu|36|h,hw,v|25|1|0|1|25|25|0|0|0|36
+56|Gerrit v/d Veen College|55|h,hw|82|88|95|0|59|45|7|5|2|55
+57|Gerrit v/d Veen College|55|v|33|52|46|0|57|31|11|3|12|55
+58|Havo de Hof|87|h,hw|53|40|36|0|85|53|10|7|15|84
+59|Hervormd Lyceum West|90|t,th|84|102|98|0|123|81|36|6|0|123
+60|Hervormd Lyceum West|90|h,hw|48|80|65|0|71|48|22|0|1|74
+61|Hervormd Lyceum West|30|v|13|39|34|0|15|13|0|0|2|30
+62|HLW Digi Tech/TTO|60|t,th,h,hw,v|29|33|23|0|37|30|5|1|1|29
+63|Het 4e Gymnasium|146|v|88|97|97|0|176|87|30|11|48|173
+64|Het Amsterdams Lyceum|170|v|273|215|205|0|200|173|24|3|0|192
+65|HLZ|116|h,hw|60|92|126|0|121|40|18|29|34|116
+66|HLZ|58|v|21|43|68|0|60|19|13|10|18|58
+67|Hubertus & Berkhoff TTO|20|k,kt|10|3|4|0|10|10|0|0|0|20
+68|Hubertus & Berkhoff|100|b,bk,k,kt|82|75|48|0|84|82|2|0|0|100
+69|Hubertus & Berkhoff|45|t,th|10|4|15|0|10|10|0|0|0|35
+70|Huygens College|110|b,bk,k,kt,t|83|123|126|0|85|83|0|1|1|110
+71|Hyperion Lyceum|150|v|175|122|103|0|153|125|20|5|3|150
+72|Ignatiusgymnasium|168|v|164|172|158|0|145|118|20|4|3|140
+73|Ir. Lely Technasium|50|h,hw|20|15|10|0||||||0
+74|Ir. Lely Technasium|43|t,th|25|15|10|0||||||0
+75|Ir. Lely Technasium|25|v|10|8|5|0||||||0
+76|Ir. Lely Lyceum|52|h,hw|41|19|10|0|58|53|5|0|0|92
+77|Ir. Lely Lyceum|50|t,th|52|25|10|0|72|70|0|1|1|83
+78|Ir. Lely Lyceum|30|v|19|6|5|0|26|24|2|0|0|50
+79|IVKO DAMU|6|t,th,h,hw|5|1|0|1|4|4|0|0|0|4
+80|IVKO|44|h,hw|60|15|11|1|47|43|4|0|0|44
+81|IVKO|58|t,th|95|20|12|1|60|60|0|0|0|58
+82|Joodse SG Maimonides|60|t,th,h,hw,v|36|4|4|0|42|36|2|2|2|56
+83|Kairos Tienercollege|37|h,hw|33|22|18|0|20|18|2|0|0|33
+84|Kairos Tienercollege|38|t,th|32|29|21|0|19|18|1|0|0|32
+85|Kairos Tienercollege|37|v|18|9|6|0|19|17|1|1|0|18
+86|Kiem Montessori|28|h|5|4|8|0|14|5|6|0|3|5
+87|Kiem Montessori|56|t,th|53|51|41|0|61|47|7|4|3|60
+88|LUCA|16|b|5|5|5|0||||||0
+89|Lumion|112|h,hw|74|62|63|0|93|74|10|2|7|112
+90|Lumion|140|t,th|120|93|104|0|142|113|27|2|0|142
+91|Lumion|56|v|36|22|24|0|38|35|2|0|1|38
+92|Marcanti College|26|h,hw|1|6|9|0|0|0|0|0|0|0
+93|Marcanti College|50|b,bk|26|35|44|0|26|26|0|0|0|50
+94|Marcanti College|60|t,th|10|14|12|0|18|10|7|0|1|60
+95|Marcanti College|56|k,kt|51|52|46|0|51|51|0|0|0|56
+96|Marcanti College|15|v|2|4|1|0|0|0|0|0|0|0
+97|Mediacollege Amsterdam|22|b,bk|12|7|1|0|13|12|1|0|0|22
+98|Mediacollege Amsterdam|24|t,th|11|7|6|0|12|11|0|1|0|24
+99|Mediacollege Amsterdam|42|k,kt|24|14|12|0|25|24|1|0|0|42
+100|Metis Coderclass/K&C|56|h,hw|121|119|93|0|59|55|2|1|1|54
+101|Metis Coderclass/K&C|56|v|77|81|78|0|56|50|3|3|0|54
+102|Metis Technasium|28|h,hw|113|101|88|0|29|27|1|1|0|27
+103|Metis Technasium|28|v|92|107|91|0|27|24|3|0|0|27
+104|Metropolis Lyceum|60|h,hw|49|49|26|0|67|49|4|3|11|90
+105|Metropolis Lyceum|60|t,th|35|51|58|0|51|35|6|4|6|60
+106|Metropolis Lyceum|60|v|9|9|8|0|12|9|1|1|1|30
+107|MLA Gymnasium|30|v|10|21|20|0|29|10|3|3|13|29
+108|Montessori Lyceum Amsterdam|56|h,hw|70|75|138|0|60|40|8|7|5|56
+109|MLA|54|t,th|49|105|126|0|57|32|18|5|2|54
+110|MLA|84|v|34|55|58|0|87|31|22|13|21|87
+111|ML Oostpoort|30|h,hw,v|5|8|19|0|11|5|0|3|3|50
+112|ML Oostpoort|90|b,bk,k,kt,t,th|59|93|144|0|69|59|8|1|1|120
+113|Montessori Lyceum Pax|65|h,hw|43|49|56|0|107|39|23|10|35|102
+114|ML Pax|35|t,th|49|53|43|0|38|33|5|0|0|35
+115|ML Pax|40|v|16|24|16|0|30|15|8|2|5|30
+116|ML Terra Nova|75|h,hw|5|5|9|0|10|5|2|1|2|80
+117|ML Terra Nova|75|t,th|18|17|20|0|19|18|1|0|0|92
+118|ML Terra Nova|25|kt|24|25|35|0|24|24|0|0|0|30
+119|ML Terra Nova|75|v|5|1|4|0|5|5|0|0|0|30
+120|Mundus College|76|b,bk|29|14|35|0|29|29|0|0|0|76
+121|Mundus College|44|k,kt|19|10|48|0|19|19|0|0|0|44
+122|Mundus College|30|t|2|1|6|0|2|2|0|0|0|24
+123|OSB|66|h,hw|33|32|16|0|41|33|2|3|3|66
+124|OSB|24|b,bk|61|30|29|0|24|24|0|0|0|24
+125|OSB|159|t,th|71|62|25|0|75|71|3|0|1|159
+126|OSB|72|k,kt|79|33|27|0|72|72|0|0|0|72
+127|OSB|25|v|11|12|9|0|12|11|0|1|0|15
+128|Over-Y Sportklas|50|t,th,h|3|11|9|0|3|3|0|0|0|50
+129|Over-Y|104|t,th,h|51|61|43|0|57|51|4|1|1|104
+130|PNC Plus|29|v|6|13|6|0|10|6|1|1|2|11
+131|Pieter Nieuwland College|116|h,hw|100|75|73|0|153|98|20|8|27|152
+132|PNC|58|v|36|27|33|0|55|36|8|5|6|68
+133|Spinoza Gymnasium|60|v|24|48|43|0|61|29|10|4|18|60
+134|Spinoza Muziekplus|19|h,hw|17|13|13|0|20|13|5|0|2|19
+135|Spinoza Lyceum|68|h,hw|111|185|186|0|71|53|14|3|1|68
+136|Spinoza Lyceum|54|t,th|130|161|159|0|56|56|0|0|0|54
+137|Spinoza Lyceum|28|v|70|78|116|0|29|23|6|0|0|28
+138|Spinoza20first|54|t,th|50|50|50|0|187|111|30|9|37|180
+139|Spinoza20first|116|h,hw|45|50|40|0||||||0
+140|Spinoza20first|30|v|15|15|10|0||||||0
+141|Spring High|70|t,th,h,hw,v|3|6|19|0|10|3|2|0|5|70
+142|St. Nicolaaslyceum TTO|28|h,hw|71|94|56|0|30|29|1|0|0|28
+143|St. Nicolaaslyceum TTO|56|v|57|54|59|0|57|52|5|0|0|56
+144|St. Nicolaaslyceum|84|h,hw|281|251|211|0|89|88|1|0|0|84
+145|St. Nicolaaslyceum|56|v|211|196|183|0|58|58|0|0|0|56
+146|Sweelinck Havo-pot.|84|t,th,h|10|15|20|0||||||0
+147|Sweelinck College|28|t|33|33|58|0|56|33|10|4|9|126
+148|TASC|30|b,bk|18|11|15|0|23|18|5|0|0|30
+149|TASC|30|k,kt|8|17|18|0|10|8|2|0|0|30
+150|TASC|30|t,th|5|4|2|0|5|5|0|0|0|30
+151|TASC|30|h|5|5|5|0||||||0
+152|Vinse School|32|h,hw|65|56|40|0|35|33|0|2|0|32
+153|Vinse School|24|t,th|51|68|58|0|26|23|2|1|0|24
+154|Vinse School|12|v|26|20|25|0|12|12|0|0|0|12
+155|VONK|100|b,bk,k,kt,t|104|71|47|0|100|99|1|0|0|100
+156|Vossius Gymnasium|140|v|95|137|149|0|173|83|39|20|31|168
+157|Xplore|30|h,hw|32|11|13|0|38|32|1|0|5|44
+158|Xplore|25|t,th|30|17|26|0|33|27|3|1|2|31
+159|Xplore|25|v|12|4|5|0|16|12|1|1|2|21
+160|Yuverta Oost|38|b,bk,k|14|28|31|0|18|14|4|0|0|38
+161|Yuverta West|120|b,bk,k,kt|25|60|51|0|25|25|0|0|0|120
+162|Yuverta West|45|t|2|4|2|0|2|2|0|0|0|45
+163|De Apollo|32|t,th|5|5|5|0||||||0
+164|De Apollo|32|th,h,hw|5|5|5|0||||||0`.trim().split('\n').map(l=>{
+  const p=l.split('|');
+  return{id:+p[0],n:p[1],cap:+p[2],acc:p[3],v1:+p[4],v2:+p[5],v3:+p[6],intake:+p[7],g25:+p[8]||0,n1:+p[9]||0,n2:+p[10]||0,n3:+p[11]||0,n4p:+p[12]||0,cap25:+p[13]||0};
+});
+
+// ================================================================
+// ADVIES CONFIG
+// ================================================================
+const ADVIES=[
+  {code:'h',  label:'Havo',              listReq:12,pool:'H'},
+  {code:'hw', label:'Havo/VWO',          listReq:12,pool:'H'},
+  {code:'v',  label:'VWO',               listReq:12,pool:'V'},
+  {code:'th', label:'VMBO-GL-TL/Havo',   listReq:6, pool:'T'},
+  {code:'t',  label:'VMBO-GL-TL (mavo)', listReq:6, pool:'T'},
+  {code:'kt', label:'VMBO-K/GL-TL',      listReq:6, pool:'T'},
+  {code:'k',  label:'VMBO-Kader',        listReq:4, pool:'K'},
+  {code:'bk', label:'VMBO-Basis/Kader',  listReq:4, pool:'B'},
+  {code:'b',  label:'VMBO-Basis',        listReq:4, pool:'B'},
+];
+const POOLS={
+  H:{size:2255,codes:['h','hw'],listLen:12},
+  V:{size:2407,codes:['v'],listLen:12},
+  T:{size:1790,codes:['t','th','kt'],listLen:6},
+  K:{size:633, codes:['k'],listLen:4},
+  B:{size:565, codes:['b','bk'],listLen:4},
+};
+
+// Preset lists per advies type
+const PRESETS=[
+  {advies:'h', label:'Havo — voorbeeld gemengde lijst',
+   ids:[49,32,100,56,131,52,58,89,104,21,41,60]},
+  {advies:'v', label:'VWO — voorbeeld populaire gymnasia + lycea',
+   ids:[3,64,40,71,72,63,156,50,137,57,34,110]},
+  {advies:'t', label:'VMBO-GL-TL — voorbeeld breed georiënteerd',
+   ids:[33,136,90,43,59,53]},
+  {advies:'b', label:'VMBO-Basis — voorbeeld gemengd',
+   ids:[18,155,68,26,70,23]},
+];
+
+// ================================================================
+// STATE
+// ================================================================
+let curAdvies='h';
+let prefIds=[];   // ordered list of dept IDs
+let allFT=[];     // fillTimes from simulation runs
+let simRunning=false;
+let runsComplete=0;
+const N_TOTAL=7650;
+const N_RUNS=2500;
+
+function getAdviesObj(){return ADVIES.find(a=>a.code===curAdvies);}
+function getPool(){return POOLS[getAdviesObj().pool];}
+function getDepts(){return RAW.filter(d=>d.acc.split(',').includes(curAdvies));}
+
+// ================================================================
+// UI: Advies selector
+// ================================================================
+const advSel=document.getElementById('advies');
+ADVIES.forEach(a=>{const o=document.createElement('option');o.value=a.code;o.textContent=a.label;advSel.appendChild(o);});
+advSel.value='h';
+advSel.addEventListener('change',()=>{curAdvies=advSel.value;prefIds=[];tempCalibrated=false;resetSim();renderAll();});
+
+// ================================================================
+// UI: Autocomplete school search
+// ================================================================
+let acItems=[];   // available departments, filtered for current advies
+let acIndex=-1;   // keyboard highlight index
+
+function updateSchoolDropdown(){
+  // Rebuild the available items list (called by renderAll)
+  acItems=getDepts().filter(d=>!prefIds.includes(d.id)).sort((a,b)=>a.n.localeCompare(b.n));
+  const inp=document.getElementById('schoolInput');
+  if(inp)inp.value='';
+  closeAc();
+}
+
+function getAvailableItems(query){
+  const q=query.toLowerCase().trim();
+  if(!q)return acItems;
+  return acItems.filter(d=>d.n.toLowerCase().includes(q));
+}
+
+function renderAcList(items){
+  const list=document.getElementById('acList');
+  list.textContent='';
+  if(!items.length){
+    const empty=document.createElement('div');empty.className='ac-empty';
+    empty.textContent='Geen scholen gevonden';
+    list.appendChild(empty);
+    list.classList.add('open');
+    return;
+  }
+  items.forEach((d,i)=>{
+    const ratio=d.v1/d.cap;
+    const div=document.createElement('div');
+    div.className='ac-item'+(i===acIndex?' ac-active':'');
+    div.dataset.id=d.id;
+    const name=document.createElement('span');name.className='ac-item-name';
+    name.textContent=d.n;
+    const tag=document.createElement('span');
+    tag.className='tag';
+    if(d.intake){tag.className+=' tag-int';tag.textContent='Intake';}
+    else if(ratio>1){tag.className+=' tag-hot';tag.textContent='Overaangemeld';}
+    else if(ratio<.7){tag.className+=' tag-ok';tag.textContent='Onderbezet';}
+    const meta=document.createElement('span');meta.className='ac-item-meta';
+    meta.textContent=d.cap+' pl.';
+    div.append(name);
+    if(tag.textContent)div.append(tag);
+    div.append(meta);
+    div.addEventListener('mousedown',e=>{e.preventDefault();selectAcItem(d.id);});
+    list.appendChild(div);
+  });
+  list.classList.add('open');
+}
+
+function selectAcItem(id){
+  if(!prefIds.includes(id)){prefIds.push(id);resetSim();renderAll();}
+  document.getElementById('schoolInput').value='';
+  closeAc();
+  document.getElementById('schoolInput').focus();
+}
+
+function closeAc(){
+  acIndex=-1;
+  const list=document.getElementById('acList');
+  if(list){list.classList.remove('open');list.textContent='';}
+}
+
+// Wire up the input
+(function initAc(){
+  const inp=document.getElementById('schoolInput');
+  const list=document.getElementById('acList');
+
+  inp.addEventListener('input',()=>{
+    acIndex=-1;
+    const items=getAvailableItems(inp.value);
+    renderAcList(items);
+  });
+
+  inp.addEventListener('focus',()=>{
+    if(inp.value||!list.classList.contains('open')){
+      acIndex=-1;
+      renderAcList(getAvailableItems(inp.value));
+    }
+  });
+
+  inp.addEventListener('blur',()=>{
+    // Small delay so mousedown on item fires first
+    setTimeout(closeAc,120);
+  });
+
+  inp.addEventListener('keydown',e=>{
+    const items=getAvailableItems(inp.value);
+    if(!items.length)return;
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      acIndex=Math.min(acIndex+1,items.length-1);
+      renderAcList(items);
+      scrollAcIntoView();
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      acIndex=Math.max(acIndex-1,0);
+      renderAcList(items);
+      scrollAcIntoView();
+    }else if(e.key==='Enter'){
+      e.preventDefault();
+      if(acIndex>=0&&acIndex<items.length)selectAcItem(items[acIndex].id);
+      else if(items.length===1)selectAcItem(items[0].id);
+    }else if(e.key==='Escape'){
+      closeAc();inp.blur();
+    }
+  });
+})();
+
+function scrollAcIntoView(){
+  const active=document.querySelector('.ac-item.ac-active');
+  if(active)active.scrollIntoView({block:'nearest'});
+}
+
+// ================================================================
+// UI: Preference list
+// ================================================================
+function renderPrefList(){
+  const el=document.getElementById('prefList');
+  if(!prefIds.length){el.innerHTML='<div class="list-empty">Voeg scholen toe aan je voorkeurslijst.<br>Selecteer een school hierboven en klik "Toevoegen".</div>';return;}
+  el.innerHTML='';
+  prefIds.forEach((id,i)=>{
+    const d=RAW.find(x=>x.id===id);if(!d)return;
+    const ratio=d.v1/d.cap;
+    let tag='';
+    if(d.intake)tag+='<span class="tag tag-int">Intake</span>';
+    if(ratio>1)tag+='<span class="tag tag-hot">Overaangemeld</span>';
+    else if(ratio<.7)tag+='<span class="tag tag-ok">Onderbezet</span>';
+    const div=document.createElement('div');div.className='pref-item';
+    div.innerHTML=`<span class="pref-rk">${i+1}</span><span class="pref-name">${d.n}${tag}</span><span class="pref-cap">${d.cap}</span><div class="pref-btns"><button class="btn-sm" onclick="moveUp(${i})" ${i===0?'disabled':''}>▲</button><button class="btn-sm" onclick="moveDown(${i})" ${i===prefIds.length-1?'disabled':''}>▼</button><button class="btn-sm btn-danger" onclick="removeSchool(${i})">✕</button></div>`;
+    el.appendChild(div);
+  });
+}
+
+function moveUp(i){if(i>0){[prefIds[i-1],prefIds[i]]=[prefIds[i],prefIds[i-1]];resetSim();renderAll();}}
+function moveDown(i){if(i<prefIds.length-1){[prefIds[i],prefIds[i+1]]=[prefIds[i+1],prefIds[i]];resetSim();renderAll();}}
+function removeSchool(i){prefIds.splice(i,1);resetSim();renderAll();}
+
+function renderListInfo(){
+  const el=document.getElementById('listInfo');
+  const req=getAdviesObj().listReq;
+  const n=prefIds.length;
+  const ok=n>=req;
+  el.innerHTML=`<span>${n} van ${req} scholen${ok?'':' (min. '+req+' voor plaatsingsgarantie)'}</span><span class="${ok?'ok':'nok'}">${ok?'✓ Plaatsingsgarantie':'⚠ Onvolledig'}</span>`;
+  document.getElementById('prefCount').textContent=n?`(${n} scholen)`:'';
+}
+
+// ================================================================
+// SIMULATION ENGINE (fillTimes, parameterized)
+// ================================================================
+function resetSim(){
+  allFT=[];runsComplete=0;simRunning=false;
+  document.getElementById('simPanel').classList.toggle('hidden',prefIds.length===0);
+}
+
+function getSimConfig(){
+  const pool=getPool();
+  const poolCodes=pool.codes;
+  // All depts accessible to any code in pool
+  const simDepts=RAW.filter(d=>{const a=d.acc.split(',');return poolCodes.some(c=>a.includes(c));});
+  // Weighted attractiveness: v1 weighted most heavily (0.6) as strongest signal,
+  // v2/v3 (0.25/0.15) capture backup-choice demand. Must match calibrateTemp().
+  const attract=simDepts.map(d=>Math.log(Math.max(1,d.v1*.6+d.v2*.25+d.v3*.15)));
+  // Map prefIds to simDept indices
+  const prefMap=prefIds.map(pid=>simDepts.findIndex(d=>d.id===pid));
+  // Dept-to-prefIndex lookup
+  const dToP=new Int8Array(simDepts.length).fill(-1);
+  prefMap.forEach((si,pi)=>{if(si>=0)dToP[si]=pi;});
+  return{depts:simDepts,attract,prefMap,dToP,poolSize:pool.size,nPref:prefIds.length,listLen:pool.listLen,temp:calibratedTemp};
+}
+
+function runSimChunk(cfg){
+  const{depts,attract,prefMap,dToP,poolSize,nPref,listLen}=cfg;
+  const ND=depts.length;const nO=poolSize-1;const LL=Math.min(listLen,ND);
+  const _u=new Float64Array(ND),_ix=new Uint16Array(ND);
+
+  const TEMP=cfg.temp||1.4;
+  function genPrefs(out){
+    for(let i=0;i<ND;i++){_u[i]=attract[i]/TEMP-Math.log(-Math.log(Math.random()+1e-30)+1e-30);_ix[i]=i;}
+    const n=Math.min(LL,ND);
+    for(let i=0;i<n;i++){let mx=i;for(let j=i+1;j<ND;j++)if(_u[_ix[j]]>_u[_ix[mx]])mx=j;if(mx!==i){const t=_ix[i];_ix[i]=_ix[mx];_ix[mx]=t;}out[i]=_ix[i];}
+  }
+
+  const CHUNK=20;
+  for(let run=0;run<CHUNK;run++){
+    const allP=new Uint16Array(nO*LL),buf=new Uint16Array(LL);
+    for(let i=0;i<nO;i++){genPrefs(buf);allP.set(buf,i*LL);}
+    for(let i=nO-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));if(i!==j){const oi=i*LL,oj=j*LL;for(let k=0;k<LL;k++){const t=allP[oi+k];allP[oi+k]=allP[oj+k];allP[oj+k]=t;}}}
+    const rem=new Int16Array(ND);for(let i=0;i<ND;i++)rem[i]=depts[i].cap;
+    const ft=new Uint16Array(nPref);for(let k=0;k<nPref;k++){const si=prefMap[k];ft[k]=si>=0&&depts[si].cap>0?nO+1:0;}
+    for(let pos=0;pos<nO;pos++){
+      const base=pos*LL;
+      for(let k=0;k<LL;k++){const dept=allP[base+k];if(rem[dept]>0){rem[dept]--;const pi=dToP[dept];if(pi>=0&&rem[dept]===0&&ft[pi]>nO)ft[pi]=pos+1;break;}}
+    }
+    allFT.push(ft);runsComplete++;
+  }
+}
+
+function queryPlacement(ft,P,nPref){for(let k=0;k<nPref;k++)if(ft[k]>P)return k;return-1;}
+
+// ================================================================
+// RENDERING
+// ================================================================
+function renderSim(){
+  if(!prefIds.length)return;
+  const lotNum=+document.getElementById('sl').value;
+  document.getElementById('lv').textContent=lotNum.toLocaleString('nl-NL');
+  const pctile=Math.round(lotNum/N_TOTAL*100);
+  const ls=document.getElementById('ls');
+  if(pctile<=10)ls.textContent=`top ${pctile}% — gunstig`;
+  else if(pctile<=40)ls.textContent=`top ${pctile}% — bovengemiddeld`;
+  else if(pctile<=60)ls.textContent='rond de mediaan';
+  else if(pctile<=80)ls.textContent=`percentiel ${pctile} — benedengemiddeld`;
+  else ls.textContent=`percentiel ${pctile} — ongunstig`;
+
+  if(!allFT.length){renderEmptyTable();return;}
+
+  const pool=getPool();
+  const P=Math.round((lotNum-1)/(N_TOTAL-1)*(pool.size-1));
+  const nP=prefIds.length;
+  const counts=new Uint32Array(nP);let total=0;
+  for(let r=0;r<allFT.length;r++){const k=queryPlacement(allFT[r],P,nP);if(k>=0)counts[k]++;total++;}
+  if(!total)total=1;
+  const probs=Array.from({length:nP},(_,i)=>counts[i]/total);
+
+  // Stats
+  const fmt=v=>v<.003?'<1%':(v*100).toFixed(1)+'%';
+  const cls=v=>v>=.55?'c-good':v>=.25?'c-warn':'c-bad';
+  const p1=probs[0],p3=probs.slice(0,3).reduce((a,b)=>a+b,0),p5=probs.slice(0,5).reduce((a,b)=>a+b,0);
+  let maxP=0,maxI=0;probs.forEach((p,i)=>{if(p>maxP){maxP=p;maxI=i;}});
+  const topName=RAW.find(d=>d.id===prefIds[maxI])?.n||'—';
+
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="s"><div class="s-val ${cls(p1)}">${fmt(p1)}</div><div class="s-lbl">Kans 1e keuze</div></div>
+    <div class="s"><div class="s-val ${cls(p3)}">${fmt(p3)}</div><div class="s-lbl">Kans top 3</div></div>
+    <div class="s"><div class="s-val ${cls(p5)}">${fmt(p5)}</div><div class="s-lbl">Kans top 5</div></div>
+    <div class="s"><div class="s-val" style="font-size:14px">${topName.length>22?topName.slice(0,21)+'…':topName}</div><div class="s-lbl">Meest waarschijnlijk</div></div>
+    <div class="s"><div class="s-val">${runsComplete.toLocaleString('nl-NL')}</div><div class="s-lbl">Iteraties</div></div>`;
+
+  // Table
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  let cum=0;
+  for(let i=0;i<nP;i++){
+    const d=RAW.find(x=>x.id===prefIds[i]);if(!d)continue;
+    const p=probs[i];cum+=p;
+    const pPct=Math.round(p*100),cPct=Math.round(cum*100);
+    const cc=p>=.12?'c-good':p>=.02?'c-warn':p>.003?'c-bad':'c-mut';
+    const bc=p>=.12?'var(--good)':p>=.02?'var(--acc)':'var(--bad)';
+    const bw=Math.max(p>.003?1.5:0,Math.min(100,p*100));
+    const approx=d.v1<5;const uncertain=d.v1<15;
+    const disp=p<.003?'<1%':(approx?'~':'')+pPct+'%';
+    const ratio=d.v1/d.cap;
+    let tag='';if(d.intake)tag+='<span class="tag tag-int">Intake</span>';
+    if(approx)tag+='<span class="tag" style="background:var(--warnbg);color:var(--warn)" title="Weinig historische data — schatting onzeker">&plusmn;</span>';
+    if(ratio>1)tag+='<span class="tag tag-hot">Overaangemeld</span>';else if(ratio<.7)tag+='<span class="tag tag-ok">Onderbezet</span>';
+    const isTop=i===maxI;
+    const tr=document.createElement('tr');if(isTop)tr.className='row-top';
+    tr.innerHTML=`<td class="col-rk">${i+1}</td><td class="col-nm">${d.n}${tag}</td><td class="col-n">${d.cap}</td><td class="bar-c"><div class="bw"><span class="bt"><span class="bf" style="width:${bw}%;background:${bc}"></span></span><span class="bp ${cc}">${disp}</span></div></td><td class="col-n" style="color:var(--ink4)">${cPct}%</td>`;
+    tb.appendChild(tr);
+  }
+  // Show uncertainty footnote if any small-data school is in the list
+  const hasApprox=prefIds.some(pid=>{const d=RAW.find(x=>x.id===pid);return d&&d.v1<5;});
+  document.getElementById('simNote').style.display=hasApprox?'block':'none';
+}
+
+function renderEmptyTable(){
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  // Static loading state — no user-controlled content, all hardcoded strings
+  const sg=document.getElementById('statsGrid');
+  sg.innerHTML='';
+  const wrapper=document.createElement('div');wrapper.className='s loading-state';
+  const sp=document.createElement('div');sp.className='spinner spinner-lg';
+  const lbl=document.createElement('div');lbl.className='loading-label';lbl.id='loadingLabel';lbl.textContent='Simulatie wordt voorbereid\u2026';
+  const pwrap=document.createElement('div');pwrap.style.cssText='width:80%;max-width:240px';
+  const pbar=document.createElement('div');pbar.className='progress-wrap';
+  const pfill=document.createElement('div');pfill.className='progress-bar';pfill.id='progressBar';pfill.style.width='0%';
+  pbar.appendChild(pfill);pwrap.appendChild(pbar);
+  const det=document.createElement('div');det.className='loading-detail';det.id='loadingDetail';
+  wrapper.append(sp,lbl,pwrap,det);
+  sg.appendChild(wrapper);
+}
+
+function renderAnalytical(){
+  const el=document.getElementById('analyticalPanel');
+  if(!prefIds.length){el.innerHTML='';return;}
+  const pool=getPool();
+  const poolCodes=pool.codes;
+  // Compute weighted attractiveness sum for the pool (Plackett-Luce normalizer)
+  const poolDepts=RAW.filter(d=>{const a=d.acc.split(',');return poolCodes.some(c=>a.includes(c));});
+  const wFn=d=>Math.max(1,d.v1*.6+d.v2*.25+d.v3*.15);
+  const sumW=poolDepts.reduce((s,d)=>s+wFn(d),0);
+  const N=pool.size;const LL=pool.listLen;
+  const rows=prefIds.map(pid=>{
+    const d=RAW.find(x=>x.id===pid);if(!d)return null;
+    // Plackett-Luce analytical: P(school in top LL) = 1-(1-w/W)^LL
+    const w=wFn(d);
+    const pInList=1-Math.pow(1-w/sumW,LL);
+    const listings=Math.round(N*pInList);
+    const overSub=listings/d.cap;
+    const cutPct=Math.min(100,Math.round(d.cap/Math.max(1,listings)*100));
+    const v1rat=d.v1/d.cap;
+    return{n:d.n,cap:d.cap,v1:d.v1,v1rat,listings,overSub,cutPct,known:d.v1+d.v2+d.v3};
+  }).filter(Boolean);
+  if(!rows.length){el.innerHTML='';return;}
+  const trs=rows.map(r=>{
+    const cls=r.overSub>1.5?'c-bad':r.overSub>1?'c-warn':'c-good';
+    const v1cls=r.v1rat>1?'c-bad':r.v1rat>0.7?'c-warn':'c-good';
+    return '<tr><td style="font-size:11px">'+r.n+'</td><td class="col-n">'+r.cap+'</td><td class="col-n">'+r.v1+'</td><td class="col-n '+v1cls+'">'+(r.v1rat<1?(r.v1rat*100).toFixed(0)+'%':r.v1rat.toFixed(1)+'x')+'</td><td class="col-n">'+r.listings+'</td><td class="col-n '+cls+'">'+r.overSub.toFixed(1)+'x</td><td class="col-n">'+r.cutPct+'%</td></tr>';
+  }).join('');
+  el.innerHTML='<details class="meth" style="margin-top:10px"><summary>Analytische controle — vulsnelheid per afdeling</summary>'
+    +'<p style="margin-top:8px">Verwachte vraag op basis van Plackett-Luce model ('+LL+' posities, '+N+' leerlingen, '+poolDepts.length+' afdelingen).</p>'
+    +'<table style="width:100%;margin-top:6px"><thead><tr><th style="text-align:left">School</th><th class="r">Cap</th><th class="r">V1</th><th class="r">V1/Cap</th><th class="r">Op lijst</th><th class="r">Ratio</th><th class="r">Vol bij</th></tr></thead><tbody>'
+    +trs+'</tbody></table>'
+    +'<p style="margin-top:4px;font-size:10px;color:var(--ink4)"><b>V1/Cap</b> = eerstevoorkeuren vs capaciteit (>1x = overaangemeld uit 1e voorkeur alleen). <b>Op lijst</b> = geschat aantal leerlingen dat deze school ergens op de lijst heeft. <b>Vol bij</b> = geschat lotnummerpercentiel waarop de afdeling volraakt (exclusief cascade-effecten).</p>'
+    +'</details>';
+}
+
+function renderValidation(){
+  const el=document.getElementById('validationPanel');
+  if(!prefIds.length||!allFT.length){el.innerHTML='';return;}
+  // For each school on the pref list that has 2025 data, compare model vs actual
+  const pool=getPool();const nP=prefIds.length;
+  const rows=prefIds.map((pid,idx)=>{
+    const d=RAW.find(x=>x.id===pid);if(!d||!d.g25)return null;
+    // Compute model predicted fill rate: fraction of runs where school fills
+    // A school "fills" if ft[idx] <= nO (not the sentinel nO+1)
+    const nO=pool.size-1;
+    let fillCount=0;
+    for(let r=0;r<allFT.length;r++){if(allFT[r][idx]<=nO)fillCount++;}
+    const modelFillPct=Math.round(fillCount/allFT.length*100);
+    // Compare model fill prediction against actual 2025 placement using 2025 capacity
+    const cap25=d.cap25>0?d.cap25:d.cap;
+    const actualFilled=d.g25>=cap25;
+    const modelFilled=modelFillPct>=50;
+    const match=actualFilled===modelFilled;
+    const cls=match?'c-good':'c-bad';
+    return{n:d.n,cap:d.cap,cap25,actual:d.g25,modelPct:modelFillPct,actualFilled,modelFilled,match,cls,
+      n1:d.n1,n2:d.n2,n3:d.n3,n4p:d.n4p};
+  }).filter(Boolean);
+  if(!rows.length){el.innerHTML='';return;}
+  const nCorrect=rows.filter(r=>r.match).length;
+  const trs=rows.map(r=>{
+    const fillTag=r.actualFilled?'vol':'open';
+    const mTag=r.modelFilled?'vol':'open';
+    return '<tr><td style="font-size:11px">'+r.n+'</td><td class="col-n">'+r.cap+'</td><td class="col-n">'+r.cap25+'</td>'
+      +'<td class="col-n">'+r.actual+'</td>'
+      +'<td class="col-n">'+fillTag+'</td>'
+      +'<td class="col-n">'+r.modelPct+'% ('+mTag+')</td>'
+      +'<td class="col-n '+r.cls+'">'+(r.match?'OK':'AFWIJKING')+'</td>'
+      +'<td class="col-n" style="font-size:10px">'+r.n1+'/'+r.n2+'/'+r.n3+'/'+r.n4p+'</td></tr>';
+  }).join('');
+  const hdr='<tr><th style="text-align:left">School</th><th class="r">Cap 26</th><th class="r">Cap 25</th><th class="r">Geplaatst 25</th><th class="r">2025</th><th class="r">Model</th><th class="r">Match</th><th class="r">Naar voorkeur (1/2/3/4+)</th></tr>';
+  const foot='<b>2025</b> = of de school volraakte in 2025 (geplaatst &ge; cap 2025). <b>Model</b> = voorspeld vulpercentage over alle simulatieruns. <b>Naar voorkeur</b> = werkelijke 2025-plaatsing naar voorkeurnummer.';
+  el.textContent='';
+  const details=document.createElement('details');details.className='meth';details.style.marginTop='10px';
+  const summary=document.createElement('summary');summary.textContent='Modelvalidatie \u2014 '+nCorrect+'/'+rows.length+' correct (vergelijking met 2025)';
+  const p1=document.createElement('p');p1.style.marginTop='8px';p1.textContent='Vergelijkt of het model correct voorspelt of een afdeling volraakt, op basis van 2025-capaciteit en -plaatsing.';
+  const tw=document.createElement('div');tw.style.cssText='width:100%;margin-top:6px;overflow-x:auto';
+  const tbl=document.createElement('table');tbl.style.width='100%';
+  tbl.innerHTML='<thead>'+hdr+'</thead><tbody>'+trs+'</tbody>';
+  tw.appendChild(tbl);
+  const p2=document.createElement('p');p2.style.cssText='margin-top:4px;font-size:10px;color:var(--ink4)';p2.innerHTML=foot;
+  details.append(summary,p1,tw,p2);
+  el.appendChild(details);
+}
+
+function renderAll(){
+  updateSchoolDropdown();
+  renderPrefList();
+  renderListInfo();
+  const listReady=prefIds.length>=getAdviesObj().listReq;
+  document.getElementById('simPanel').classList.toggle('hidden',!listReady);
+  if(listReady&&!simRunning)startSim();
+  else if(listReady){renderSim();renderValidation();}
+  if(listReady)renderAnalytical();
+}
+
+// ================================================================
+// TEMPERATURE AUTO-CALIBRATION
+// ================================================================
+let calibratedTemp=1.4; // default, overridden by calibration
+let calibrationId=0;   // incremented on each calibration start; stale runs abort
+
+// Yields to the browser event loop so the UI can repaint
+function yieldUI(){return new Promise(r=>setTimeout(r,0));}
+
+async function calibrateTemp(){
+  // Two-pass calibration: coarse grid scan, then golden-section refinement.
+  // Async with yields between temperature evaluations to keep UI responsive.
+  const myId=++calibrationId;
+  const pool=getPool();const poolCodes=pool.codes;
+  const simDepts=RAW.filter(d=>{const a=d.acc.split(',');return poolCodes.some(c=>a.includes(c));});
+  const attract=simDepts.map(d=>Math.log(Math.max(1,d.v1*.6+d.v2*.25+d.v3*.15)));
+  const valDepts=simDepts.filter(d=>d.g25>0&&(d.n1+d.n2+d.n3+d.n4p)>=10);
+  if(valDepts.length<5){calibratedTemp=1.4;return;}
+  const ND=simDepts.length,nO=pool.size-1,LL=Math.min(pool.listLen,ND);
+  const _u=new Float64Array(ND),_ix=new Uint16Array(ND);
+  const stEl=document.getElementById('st');
+
+  // Evaluate rank-distribution MSE at a given temperature over nRuns iterations
+  function evalTemp(temp,nRuns){
+    const r1=new Uint32Array(ND),r2=new Uint32Array(ND),r3=new Uint32Array(ND),r4p=new Uint32Array(ND);
+    for(let run=0;run<nRuns;run++){
+      const buf=new Uint16Array(LL);
+      const allP=new Uint16Array(nO*LL);
+      for(let s=0;s<nO;s++){
+        for(let i=0;i<ND;i++){_u[i]=attract[i]/temp-Math.log(-Math.log(Math.random()+1e-30)+1e-30);_ix[i]=i;}
+        for(let i=0;i<LL;i++){let mx=i;for(let j=i+1;j<ND;j++)if(_u[_ix[j]]>_u[_ix[mx]])mx=j;if(mx!==i){const t2=_ix[i];_ix[i]=_ix[mx];_ix[mx]=t2;}buf[i]=_ix[i];}
+        allP.set(buf,s*LL);
+      }
+      for(let i=nO-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));if(i!==j){const oi=i*LL,oj=j*LL;for(let k=0;k<LL;k++){const t2=allP[oi+k];allP[oi+k]=allP[oj+k];allP[oj+k]=t2;}}}
+      const rem=new Int16Array(ND);for(let i=0;i<ND;i++)rem[i]=simDepts[i].cap;
+      for(let pos=0;pos<nO;pos++){const base=pos*LL;for(let k=0;k<LL;k++){const dept=allP[base+k];if(rem[dept]>0){rem[dept]--;if(k===0)r1[dept]++;else if(k===1)r2[dept]++;else if(k===2)r3[dept]++;else r4p[dept]++;break;}}}
+    }
+    let err=0,wSum=0;
+    for(const vd of valDepts){
+      const idx=simDepts.indexOf(vd);if(idx<0)continue;
+      const at=vd.n1+vd.n2+vd.n3+vd.n4p;
+      const mt=r1[idx]+r2[idx]+r3[idx]+r4p[idx];
+      if(mt===0)continue;
+      const w=at;
+      err+=w*((r1[idx]/mt-vd.n1/at)**2+(r2[idx]/mt-vd.n2/at)**2+(r3[idx]/mt-vd.n3/at)**2+(r4p[idx]/mt-vd.n4p/at)**2);
+      wSum+=w;
+    }
+    return wSum>0?err/wSum:Infinity;
+  }
+
+  const TOTAL_STEPS=26; // 18 grid + 8 refinement
+  function updateCalProgress(step,phase){
+    const pct=Math.round(step/TOTAL_STEPS*100);
+    const lbl=document.getElementById('loadingLabel');
+    const bar=document.getElementById('progressBar');
+    const det=document.getElementById('loadingDetail');
+    if(lbl)lbl.textContent=phase==='grid'?'Model kalibreren\u2026':'Temperatuur verfijnen\u2026';
+    if(bar)bar.style.width=pct+'%';
+    if(det)det.textContent=`Stap ${step} van ${TOTAL_STEPS}`;
+    stEl.textContent=phase==='grid'?`Kalibratie: ${step}/${TOTAL_STEPS}\u2026`:`Verfijning: ${step}/${TOTAL_STEPS}\u2026`;
+  }
+
+  // Pass 1: coarse grid scan (0.8–2.5, step 0.1, 400 runs each)
+  const gridTemps=[];
+  for(let t=0.8;t<=2.5;t=Math.round((t+0.1)*10)/10)gridTemps.push(t);
+  let bestTemp=1.4,bestErr=Infinity;
+  for(let gi=0;gi<gridTemps.length;gi++){
+    if(calibrationId!==myId)return;
+    updateCalProgress(gi+1,'grid');
+    const err=evalTemp(gridTemps[gi],400);
+    if(err<bestErr){bestErr=err;bestTemp=gridTemps[gi];}
+    await yieldUI();
+  }
+
+  // Pass 2: golden-section search in [best-0.15, best+0.15] for 6 iterations
+  const PHI=(Math.sqrt(5)-1)/2;
+  let lo=Math.max(0.5,bestTemp-0.15),hi=bestTemp+0.15;
+  let x1=hi-PHI*(hi-lo),x2=lo+PHI*(hi-lo);
+  let f1,f2;
+  if(calibrationId!==myId)return;
+  updateCalProgress(gridTemps.length+1,'refine');
+  f1=evalTemp(x1,500);await yieldUI();
+  if(calibrationId!==myId)return;
+  updateCalProgress(gridTemps.length+2,'refine');
+  f2=evalTemp(x2,500);await yieldUI();
+  for(let i=0;i<6;i++){
+    if(calibrationId!==myId)return;
+    updateCalProgress(gridTemps.length+3+i,'refine');
+    if(f1<f2){hi=x2;x2=x1;f2=f1;x1=hi-PHI*(hi-lo);f1=evalTemp(x1,500);}
+    else{lo=x1;x1=x2;f1=f2;x2=lo+PHI*(hi-lo);f2=evalTemp(x2,500);}
+    await yieldUI();
+  }
+  if(calibrationId!==myId)return;
+  calibratedTemp=Math.round((lo+hi)/2*100)/100;
+}
+
+// ================================================================
+// SIMULATION RUNNER
+// ================================================================
+// Pre-calibrated temperatures per pool (rank-distribution MSE, 2025 data).
+// Override by clicking "Herkalibreren" or update these after running calibration.
+const PRECAL_TEMP={H:1.0,V:0.89,T:1.0,K:1.0,B:1.0};
+
+let simCfg=null;let tempCalibrated=false;let simGeneration=0;
+
+function getPoolTemp(){
+  const poolKey=getAdviesObj().pool;
+  // Check localStorage cache first, then fall back to pre-calibrated
+  try{const v=localStorage.getItem('cal_'+poolKey);if(v)return+v;}catch(e){}
+  return PRECAL_TEMP[poolKey]||1.4;
+}
+
+function cachePoolTemp(temp){
+  const poolKey=getAdviesObj().pool;
+  try{localStorage.setItem('cal_'+poolKey,temp.toFixed(3));}catch(e){}
+}
+
+async function startSim(){
+  if(!prefIds.length)return;
+  const myGen=++simGeneration;
+  if(!tempCalibrated){
+    calibratedTemp=getPoolTemp();
+    tempCalibrated=true;
+  }
+  allFT=[];runsComplete=0;simRunning=true;
+  simCfg=getSimConfig();
+  // Update loading state for simulation phase
+  const lbl=document.getElementById('loadingLabel');
+  if(lbl)lbl.textContent='Simulatie uitvoeren\u2026';
+  const bar=document.getElementById('progressBar');
+  if(bar)bar.style.width='100%';
+  const det=document.getElementById('loadingDetail');
+  if(det)det.textContent=`${N_RUNS.toLocaleString('nl-NL')} iteraties — resultaten verschijnen zodra data beschikbaar is`;
+  runSimLoop();
+}
+
+function renderSimStatus(){
+  const stEl=document.getElementById('st');
+  if(runsComplete<N_RUNS){
+    stEl.className='sim-status busy';
+    stEl.textContent='';
+    const sp=document.createElement('span');sp.className='spinner';
+    const tx=document.createElement('span');tx.textContent=`Simulatie: ${runsComplete.toLocaleString('nl-NL')}/${N_RUNS.toLocaleString('nl-NL')}\u2026`;
+    stEl.append(sp,tx);
+  }else{
+    stEl.className='sim-status';
+    stEl.textContent='';
+    const txt=document.createElement('span');
+    txt.textContent=`\u2713 ${N_RUNS.toLocaleString('nl-NL')} iteraties voltooid (T=${calibratedTemp.toFixed(2)})`;
+    const btn=document.createElement('button');
+    btn.className='btn-sm';btn.style.marginLeft='8px';btn.textContent='Herkalibreren';
+    btn.onclick=recalibrate;
+    stEl.append(txt,btn);
+  }
+}
+
+async function recalibrate(){
+  tempCalibrated=false;
+  resetSim();
+  renderEmptyTable();
+  document.getElementById('st').textContent='Kalibratie: starten\u2026';
+  const myGen=++simGeneration;
+  await calibrateTemp();
+  if(simGeneration!==myGen)return;
+  cachePoolTemp(calibratedTemp);
+  tempCalibrated=true;
+  allFT=[];runsComplete=0;simRunning=true;
+  simCfg=getSimConfig();
+  runSimLoop();
+}
+
+function runSimLoop(){
+  if(!simRunning||runsComplete>=N_RUNS)return;
+  runSimChunk(simCfg);
+  renderSim();
+  renderSimStatus();
+  if(runsComplete<N_RUNS)setTimeout(runSimLoop,0);
+  else{simRunning=false;renderValidation();}
+}
+
+document.getElementById('sl').addEventListener('input',()=>{stopAnim();renderSim();});
+
+// ================================================================
+// SLIDER ANIMATION — find transitions and auto-play
+// ================================================================
+let animBPs=[];  // [{lot, label}]
+let animIdx=0;
+let animRAF=null;
+let animTimeout=null;
+
+function computeBreakpoints(){
+  if(!allFT.length||!prefIds.length)return[];
+  const pool=getPool();const nP=prefIds.length;
+  const STEP=20;const bps=[];
+  let prevTopIdx=-1;
+  const firstName=RAW.find(d=>d.id===prefIds[0])?.n||'1e keuze';
+  // Track which first-choice thresholds we've crossed
+  const thresholds=[99,90,80,70,60];
+  let nextThr=0; // index into thresholds
+  for(let lot=1;lot<=N_TOTAL;lot+=STEP){
+    const P=Math.round((lot-1)/(N_TOTAL-1)*(pool.size-1));
+    const counts=new Uint32Array(nP);
+    for(let r=0;r<allFT.length;r++){const k=queryPlacement(allFT[r],P,nP);if(k>=0)counts[k]++;}
+    let maxC=0,maxI=-1;
+    for(let i=0;i<nP;i++){if(counts[i]>maxC){maxC=counts[i];maxI=i;}}
+    // Check first-choice probability thresholds
+    const p1Pct=Math.round(counts[0]/allFT.length*100);
+    while(nextThr<thresholds.length&&p1Pct<=thresholds[nextThr]){
+      // Only add if we haven't already added a breakpoint at this lot number
+      if(!bps.length||bps[bps.length-1].lot!==lot){
+        const thr=thresholds[nextThr];
+        const lbl=thr>=99?firstName+': niet meer 100%':firstName+': '+thr+'% kans';
+        bps.push({lot,label:lbl});
+      }
+      nextThr++;
+    }
+    // Check top-school transitions
+    if(maxI!==prevTopIdx){
+      const name=maxI>=0?(RAW.find(d=>d.id===prefIds[maxI])?.n||'?'):'ongeplaatst';
+      if(prevTopIdx===-1){
+        bps.push({lot:1,label:'Meest waarschijnlijk: '+name});
+      }else{
+        bps.push({lot,label:'\u2192 '+name});
+      }
+      prevTopIdx=maxI;
+    }
+  }
+  bps.push({lot:N_TOTAL,label:'Ongunstigst'});
+  // Sort by lot number and deduplicate positions that are very close
+  bps.sort((a,b)=>a.lot-b.lot);
+  return bps;
+}
+
+function startAnim(){
+  stopAnim();
+  animBPs=computeBreakpoints();
+  if(animBPs.length<2)return;
+  animIdx=0;
+  const sl=document.getElementById('sl');
+  sl.value=animBPs[0].lot;
+  renderSim();
+  showAnimLabel(animBPs[0].label);
+  document.getElementById('animPlay').textContent='\u23F8';
+  animTimeout=setTimeout(animateToNext,1500);
+}
+
+function stopAnim(){
+  if(animRAF){cancelAnimationFrame(animRAF);animRAF=null;}
+  if(animTimeout){clearTimeout(animTimeout);animTimeout=null;}
+  document.getElementById('animPlay').textContent='\u25B6';
+  hideAnimLabel();
+}
+
+function animateToNext(){
+  animIdx++;
+  if(animIdx>=animBPs.length){stopAnim();return;}
+  const sl=document.getElementById('sl');
+  const start=+sl.value;const end=animBPs[animIdx].lot;
+  const dur=Math.min(3000,Math.max(400,Math.abs(end-start)/N_TOTAL*5000));
+  const t0=performance.now();
+  function step(now){
+    const t=Math.min(1,(now-t0)/dur);
+    const e=1-Math.pow(1-t,3); // ease-out cubic
+    sl.value=Math.round(start+(end-start)*e);
+    renderSim();
+    if(t<1){animRAF=requestAnimationFrame(step);}
+    else{animRAF=null;showAnimLabel(animBPs[animIdx].label);animTimeout=setTimeout(animateToNext,2500);}
+  }
+  hideAnimLabel();
+  animRAF=requestAnimationFrame(step);
+}
+
+function jumpBreakpoint(dir){
+  stopAnim();
+  if(!animBPs.length)animBPs=computeBreakpoints();
+  if(!animBPs.length)return;
+  const cur=+document.getElementById('sl').value;
+  let target=null;
+  if(dir>0){target=animBPs.find(bp=>bp.lot>cur+10);}
+  else{for(let i=animBPs.length-1;i>=0;i--){if(animBPs[i].lot<cur-10){target=animBPs[i];break;}}}
+  if(!target)return;
+  document.getElementById('sl').value=target.lot;
+  renderSim();
+  showAnimLabel(target.label);
+  setTimeout(hideAnimLabel,2000);
+}
+
+function showAnimLabel(text){const el=document.getElementById('animLabel');el.textContent=text;el.classList.add('visible');}
+function hideAnimLabel(){document.getElementById('animLabel').classList.remove('visible');}
+
+document.getElementById('animPlay').addEventListener('click',()=>{
+  if(animRAF||animTimeout)stopAnim();else if(allFT.length)startAnim();
+});
+document.getElementById('animPrev').addEventListener('click',()=>jumpBreakpoint(-1));
+document.getElementById('animNext').addEventListener('click',()=>jumpBreakpoint(1));
+
+// ================================================================
+// SAVE / LOAD / PRESET
+// ================================================================
+async function saveList(){
+  if(!prefIds.length){showToast('Lijst is leeg — voeg eerst scholen toe.');return;}
+  const txt=JSON.stringify({advies:curAdvies,list:prefIds});
+  document.getElementById('saveText').value=txt;
+  document.getElementById('saveStatus').className='status-msg';
+  document.getElementById('saveStatus').textContent='';
+  document.getElementById('saveModal').classList.add('open');
+  // Also try silent storage save
+  try{await window.storage.set('loting_config',txt);
+    setStatus('saveStatus','ok','✓ Automatisch opgeslagen in browser-opslag.');
+  }catch(e){}
+}
+function closeSaveModal(){document.getElementById('saveModal').classList.remove('open');}
+document.getElementById('saveModal').addEventListener('click',function(e){if(e.target===this)closeSaveModal();});
+
+async function copySaveText(){
+  const txt=document.getElementById('saveText').value;
+  try{await navigator.clipboard.writeText(txt);setStatus('saveStatus','ok','✓ Gekopieerd naar klembord!');}
+  catch(e){
+    // Fallback: select the textarea for manual copy
+    const ta=document.getElementById('saveText');ta.select();ta.setSelectionRange(0,99999);
+    setStatus('saveStatus','info','Selecteer de tekst en kopieer handmatig (Ctrl+C / ⌘C).');
+  }
+}
+async function doStorageSave(){
+  const txt=document.getElementById('saveText').value;
+  try{await window.storage.set('loting_config',txt);setStatus('saveStatus','ok','✓ Opgeslagen in browser-opslag!');}
+  catch(e){setStatus('saveStatus','err','Browser-opslag niet beschikbaar. Kopieer de tekst als alternatief.');}
+}
+
+async function loadList(){
+  document.getElementById('loadText').value='';
+  document.getElementById('loadStatus').className='status-msg';
+  document.getElementById('loadStatus').textContent='';
+  document.getElementById('loadModal').classList.add('open');
+  // Pre-fill from storage if available
+  try{
+    const r=await window.storage.get('loting_config');
+    if(r&&r.value){
+      document.getElementById('loadText').value=r.value;
+      setStatus('loadStatus','info','Lijst gevonden in browser-opslag — klik "Laden uit tekstveld" om toe te passen.');
+    }
+  }catch(e){}
+}
+function closeLoadModal(){document.getElementById('loadModal').classList.remove('open');}
+document.getElementById('loadModal').addEventListener('click',function(e){if(e.target===this)closeLoadModal();});
+
+function applyLoadText(){
+  const txt=document.getElementById('loadText').value.trim();
+  if(!txt){setStatus('loadStatus','err','Tekstveld is leeg.');return;}
+  try{
+    const cfg=JSON.parse(txt);
+    if(!cfg.list||!Array.isArray(cfg.list)){setStatus('loadStatus','err','Ongeldig formaat: "list" array ontbreekt.');return;}
+    curAdvies=cfg.advies||'h';advSel.value=curAdvies;
+    prefIds=cfg.list;tempCalibrated=false;
+    closeLoadModal();resetSim();renderAll();
+    showToast('✓ Lijst geladen ('+prefIds.length+' scholen)');
+  }catch(e){setStatus('loadStatus','err','Ongeldige JSON. Controleer of je de volledige tekst hebt geplakt.');}
+}
+async function doStorageLoad(){
+  try{
+    const r=await window.storage.get('loting_config');
+    if(r&&r.value){
+      document.getElementById('loadText').value=r.value;
+      setStatus('loadStatus','ok','✓ Geladen uit browser-opslag — klik "Laden uit tekstveld" om toe te passen.');
+    }else{setStatus('loadStatus','err','Geen opgeslagen lijst gevonden in browser-opslag.');}
+  }catch(e){setStatus('loadStatus','err','Browser-opslag niet beschikbaar.');}
+}
+
+function setStatus(id,type,msg){const el=document.getElementById(id);el.className='status-msg '+type;el.textContent=msg;}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+function loadPreset(){
+  const container=document.getElementById('presetButtons');
+  container.innerHTML='';
+  PRESETS.forEach((preset,idx)=>{
+    const names=preset.ids.map(id=>{const d=RAW.find(x=>x.id===id);return d?d.n:'?';});
+    const btn=document.createElement('button');
+    btn.className='preset-btn';
+    btn.innerHTML=`<div class="p-advies">${ADVIES.find(a=>a.code===preset.advies)?.label||preset.advies}</div><div class="p-label">${preset.label}</div><div class="p-schools">${names.join(' → ')}</div>`;
+    btn.onclick=()=>{applyPreset(idx);};
+    container.appendChild(btn);
+  });
+  document.getElementById('presetModal').classList.add('open');
+}
+
+function applyPreset(idx){
+  const preset=PRESETS[idx];if(!preset)return;
+  curAdvies=preset.advies;advSel.value=curAdvies;
+  prefIds=[...preset.ids];
+  tempCalibrated=false;
+  closePresetModal();
+  resetSim();renderAll();
+}
+
+function closePresetModal(){
+  document.getElementById('presetModal').classList.remove('open');
+}
+document.getElementById('presetModal').addEventListener('click',function(e){
+  if(e.target===this)closePresetModal();
+});
+
+// ================================================================
+// INIT
+// ================================================================
+renderAll();
+</script></body></html>
