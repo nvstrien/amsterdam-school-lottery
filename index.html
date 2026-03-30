@@ -556,7 +556,7 @@ function renderAcList(items){
 }
 
 function selectAcItem(id){
-  if(!prefIds.includes(id)){prefIds.push(id);resetSim();renderAll();}
+  if(!prefIds.includes(id)){if(!prefIds.length)listStartTime=Date.now();prefIds.push(id);shareConsent=null;resetSim();renderAll();}
   document.getElementById('schoolInput').value='';
   closeAc();
   document.getElementById('schoolInput').focus();
@@ -1298,7 +1298,9 @@ document.getElementById('presetModal').addEventListener('click',function(e){
 // ANONYMOUS LIST SHARING (opt-in gate)
 // ================================================================
 const SHARE_ENDPOINT='/api/submit-list'; // Vercel serverless function
+const sessionId=crypto.randomUUID();
 let shareConsent=null; // null=not asked, true=agreed, false=declined
+let listStartTime=0;
 
 function respondShare(agreed){
   shareConsent=agreed;
@@ -1307,7 +1309,15 @@ function respondShare(agreed){
 
 function submitShareList(){
   if(!shareConsent||!prefIds.length)return;
-  const payload={advies:curAdvies,list:prefIds,ts:Date.now()};
+  const adv=getAdviesObj();
+  if(!adv||prefIds.length<adv.listReq)return; // only submit complete lists
+  const payload={
+    advies:curAdvies,
+    list:prefIds,
+    sessionId,
+    timeToComplete:listStartTime?Math.round((Date.now()-listStartTime)/1000):0,
+    ts:Date.now()
+  };
   fetch(SHARE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(r=>{if(r.ok)showToast('\u2713 Bedankt! Je lijst is anoniem gedeeld.');})
     .catch(()=>{});
