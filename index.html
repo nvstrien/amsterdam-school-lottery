@@ -123,6 +123,7 @@ details.meth li{margin-bottom:4px}
 .anim-btns{display:flex;gap:3px;margin-left:auto}
 .anim-label{font-size:13px;font-weight:500;color:var(--acc);padding:5px 0 0;min-height:20px;opacity:0;transition:opacity .3s}
 .anim-label.visible{opacity:1}
+.lang-en{display:none}[data-lang="en"] .lang-nl{display:none}[data-lang="en"] .lang-en{display:block}
 input[type=range]::-webkit-slider-thumb{box-shadow:0 1px 4px var(--shadow)}
 .ac-list{box-shadow:0 6px 20px var(--shadow)}
 @media(max-width:640px){.pg{padding:1rem}.hdr h1{font-size:22px}.stats{grid-template-columns:repeat(2,1fr)}.col-ref{display:none}.lot-num{font-size:28px}}
@@ -192,11 +193,16 @@ input[type=range]::-webkit-slider-thumb{box-shadow:0 1px 4px var(--shadow)}
   <div id="validationPanel"></div>
 </div>
 
-<div class="note" style="margin-top:14px">
+<!-- DISCLAIMER -->
+<div class="note lang-nl" style="margin-top:14px">
 <b>Disclaimer</b> — Dit is een indicatief simulatiemodel op basis van publieke data (L&M 2025-verslag, capaciteitsopgave 2026). De werkelijke uitkomst hangt af van de voorkeurslijsten van alle ~7.650 deelnemers, die pas in april 2026 bekend zijn. Gebruik deze tool als richtlijn, niet als voorspelling.
 </div>
+<div class="note lang-en" style="margin-top:14px">
+<b>Disclaimer</b> — This is an indicative simulation model based on public data (L&amp;M 2025 report, 2026 capacity plan). The actual outcome depends on the preference lists of all ~7,650 participants, which will only be known in April 2026. Use this tool as a guideline, not a prediction.
+</div>
 
-<details class="meth">
+<!-- HOW IT WORKS — NL -->
+<details class="meth lang-nl">
 <summary>Hoe werkt deze simulatie?</summary>
 <p style="margin-top:8px"><b>In het kort</b> — Deze tool simuleert de Amsterdamse schoolloting duizenden keren om te schatten hoe groot jouw kans is op elke school in je voorkeurslijst.</p>
 <p>Bij de echte loting krijgt elk kind een willekeurig lotnummer. Kinderen worden op volgorde van dat nummer verwerkt: het kind met nummer 1 mag als eerste naar de school van eerste voorkeur, dan nummer 2, enzovoort. Als een school vol zit, schuift het kind automatisch door naar de volgende school op de lijst.</p>
@@ -214,7 +220,27 @@ input[type=range]::-webkit-slider-thumb{box-shadow:0 1px 4px var(--shadow)}
 <p style="margin-top:8px">Gebruik de uitkomsten daarom als <b>richtlijn</b> bij het samenstellen van je lijst, niet als exacte voorspelling.</p>
 </details>
 
-<details class="meth" style="margin-top:6px">
+<!-- HOW IT WORKS — EN -->
+<details class="meth lang-en">
+<summary>How does this simulation work?</summary>
+<p style="margin-top:8px"><b>In short</b> — This tool simulates the Amsterdam school lottery thousands of times to estimate your chances of being placed at each school on your preference list.</p>
+<p>In the real lottery, every child receives a random lottery number. Children are processed in order of that number: the child with number 1 gets to go to their first-choice school first, then number 2, and so on. If a school is full, the child automatically moves to the next school on their list.</p>
+<p>Nobody knows in advance which schools the other ~7,650 children will choose. That is why this tool generates <b>synthetic preference lists</b> for all other children, based on the popularity of schools in 2025 (how many children chose a school as their 1st, 2nd or 3rd preference). The lottery is then simulated: everyone gets a random number, and the system processes all children in order.</p>
+<p>We do this <b>2,500 times</b>. By counting how often you end up at each school, we get a reliable estimate of your placement chances. The lottery number slider lets you see how your chances change with a favourable or unfavourable number.</p>
+<p style="margin-top:6px"><b>What can this tool not do?</b></p>
+<ul style="margin:6px 0 0 18px;line-height:1.7">
+<li><b>Location and primary school</b> — In reality, children from Noord more often choose schools in Noord, and children from Zuid more often choose schools in Zuid. This tool does not know where the other children live and assumes everyone draws from the same pool. As a result, competition for local schools may be higher or lower in practice than shown here.</li>
+<li><b>"Cascade schools" are underestimated</b> — Some schools fill up in practice mainly with children who were rejected by more popular schools in the same neighbourhood. For example, a child who lists Fons Vitae as #1 and Spinoza as #2 often puts Berlage Tweetalig at #5 — because it is also in Zuid. This tool does not know which schools appear together on lists and distributes cascade students evenly across all schools. The result: schools that fill up via cascade in reality (e.g. Berlage Tweetalig, Havo de Hof) may be shown as "undersubscribed" in the simulation while they actually do fill up.</li>
+<li><b>Open days and reputation</b> — A successful open day or a changed reputation can cause a school to be much more popular (or less popular) in 2026 than in 2025. The tool uses last year's ratios.</li>
+<li><b>Preferences beyond position 3</b> — From the real lottery, only the number of children who chose a school as their 1st, 2nd or 3rd preference is known. What children put at positions 4 through 12 is unknown — the tool generates those positions itself based on popularity. This is the largest source of uncertainty, especially for schools that fill up almost entirely via position 4 or deeper.</li>
+<li><b>Small departments</b> — Schools with few places (e.g. DENISE with 12 places) are more sensitive to randomness. A small difference in preferences can have a large effect on your chances. These are marked with <b>&plusmn;</b>.</li>
+<li><b>Preliminary capacity</b> — The 2026 capacities are based on the capacity plan and may still change after the trial matching in April 2026.</li>
+</ul>
+<p style="margin-top:8px">Therefore, use the results as a <b>guideline</b> when composing your list, not as an exact prediction.</p>
+</details>
+
+<!-- TECHNICAL METHOD — NL -->
+<details class="meth lang-nl" style="margin-top:6px">
 <summary>Technische methode — Monte Carlo DA-STB simulatie</summary>
 <p style="margin-top:8px">Per iteratie worden synthetische leerlingen gegenereerd met voorkeurslijsten via een Plackett-Luce model. De aantrekkelijkheid van elke afdeling wordt gekalibreerd op een gewogen combinatie van voorkeur 1, 2 en 3 uit het L&M 2025-verslag, Tabel 17 (gewichten 0,6 / 0,25 / 0,15). Voorkeur 1 weegt het zwaarst (meest betrouwbaar signaal), terwijl voorkeur 2-3 het "vangneteffect" van populaire reservescholen meeneemt. Een temperatuurparameter wordt automatisch gekalibreerd per adviestype (twee-fasen zoekmethode: grof raster + gulden-snede verfijning, gevalideerd tegen 2025-plaatsingsdata) om heterogeniteit in voorkeuren te modelleren (stadsdeel, denominatie, open dagen) die niet uit de geaggregeerde data blijkt. Per adviestype worden realistische lijstlengtes gehanteerd: 12 voor havo/vwo, 6 voor vmbo-gl-tl, 4 voor vmbo-kader/basis.</p>
 <p>Alle leerlingen worden op lotnummervolgorde verwerkt volgens het DA-STB algoritme (Deferred Acceptance met Single Tie Breaking). Per run registreert het model het exacte moment (fillTime) waarop elke afdeling volraakt. De slider evalueert elk lotnummer exact over 2.500 iteraties. De analytische controle extrapoleert de bekende voorkeur 1-2-3 naar diepere posities om een onafhankelijke vulsnelheidsschatting te bieden.</p>
@@ -227,6 +253,23 @@ input[type=range]::-webkit-slider-thumb{box-shadow:0 1px 4px var(--shadow)}
 <li><b>Kleine afdelingen</b> — Afdelingen met minder dan ~15 eerstevoorkeuren hebben weinig statistisch signaal om de aantrekkelijkheid betrouwbaar te schatten. De modelonzekerheid is hier groter; resultaten worden gemarkeerd met <b>&plusmn;</b>.</li>
 <li><b>Voorlopige capaciteit</b> — De gebruikte capaciteiten zijn gebaseerd op de capaciteitsopgave 2026. De definitieve capaciteit wordt vastgesteld na de proefmatching (april 2026) en kan afwijken.</li>
 <li><b>Jaar-op-jaar volatiliteit</b> — Populariteit van scholen fluctueert door open dagen, media-aandacht en mond-tot-mondreclame. Het model extrapoleert de verhoudingen van 2025 en vangt geen trendbreuken op.</li>
+</ul>
+</details>
+
+<!-- TECHNICAL METHOD — EN -->
+<details class="meth lang-en" style="margin-top:6px">
+<summary>Technical method — Monte Carlo DA-STB simulation</summary>
+<p style="margin-top:8px">Each iteration generates synthetic students with preference lists using a Plackett-Luce model. The attractiveness of each department is calibrated on a weighted combination of preference 1, 2 and 3 from the L&amp;M 2025 report, Table 17 (weights 0.6 / 0.25 / 0.15). Preference 1 is weighted most heavily (most reliable signal), while preferences 2-3 capture the "safety net effect" of popular backup schools. A temperature parameter is automatically calibrated per advice type (two-phase search: coarse grid + golden-section refinement, validated against 2025 placement data) to model preference heterogeneity (district, denomination, open days) not visible in the aggregated data. Per advice type, realistic list lengths are used: 12 for havo/vwo, 6 for vmbo-gl-tl, 4 for vmbo-kader/basis.</p>
+<p>All students are processed in lottery number order according to the DA-STB algorithm (Deferred Acceptance with Single Tie Breaking). Each run records the exact moment (fillTime) when each department reaches capacity. The slider evaluates each lottery number exactly over 2,500 iterations. The analytical check extrapolates the known preferences 1-2-3 to deeper positions for an independent fill rate estimate.</p>
+<p style="margin-top:6px"><b>Limitations (technical):</b></p>
+<ul style="margin:4px 0 0 18px;line-height:1.7">
+<li><b>Homogeneous preferences</b> — The Plackett-Luce model assumes all students within an advice type draw from the same probability distribution. In reality, preferences are heterogeneous: a family in Nieuw-West has a different distribution than a family in Oost. A mixture model would capture this better, but the public data contains no breakdown by district or primary school to calibrate such a model.</li>
+<li><b>Unknown deep preferences and cascade concentration</b> — Only preferences 1, 2 and 3 are published (L&amp;M 2025, Table 17). Positions 4-12 are generated by the Plackett-Luce model. The actual correlation between deep preferences (e.g. "whoever puts Fons Vitae at #1 often puts Berlage Tweetalig at #5") is not observable from the aggregated data. This leads to a systematic underestimation of the fill rate of schools that fill mainly via cascade. In 2025, Berlage Tweetalig (havo) filled 48% of places via preference 4 or deeper; the model cannot reproduce this concentrated cascade because it distributes overflow students evenly across all departments rather than in geographically coherent clusters.</li>
+<li><b>No cross-pool interaction</b> — Departments accessible to multiple advice types (e.g. a department with havo + vmbo-tl/havo access) are simulated per pool separately. In reality, students from different advice pools compete for the same places. For departments with broad access codes, this is an underestimation of competition.</li>
+<li><b>No intake simulation</b> — Intake procedures (e.g. dance, sports) are not modelled. Intake departments are marked but not simulated with separate selection.</li>
+<li><b>Small departments</b> — Departments with fewer than ~15 first preferences have little statistical signal to reliably estimate attractiveness. Model uncertainty is greater here; results are marked with <b>&plusmn;</b>.</li>
+<li><b>Preliminary capacity</b> — The capacities used are based on the 2026 capacity plan. The definitive capacity will be determined after the trial matching (April 2026) and may differ.</li>
+<li><b>Year-on-year volatility</b> — School popularity fluctuates due to open days, media attention and word of mouth. The model extrapolates the 2025 ratios and does not capture trend breaks.</li>
 </ul>
 </details>
 </div>
@@ -339,6 +382,7 @@ function t(key){return curLang==='en'&&EN[key]?EN[key]:null;}
 function setLang(lang){
   curLang=lang;
   localStorage.setItem('lang',lang);
+  document.documentElement.setAttribute('data-lang',lang);
   document.getElementById('langBtn').textContent=lang==='nl'?'EN':'NL';
   document.getElementById('langBtn').title=lang==='nl'?'Switch to English':'Schakel naar Nederlands';
   document.getElementById('themeBtn').title=lang==='en'?'Switch between light and dark theme':'Wissel tussen licht en donker thema';
