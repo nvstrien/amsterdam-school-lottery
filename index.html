@@ -258,6 +258,20 @@ details.meth p{margin-top:5px}
   </div>
 </div>
 
+<!-- SHARE OPT-IN BANNER -->
+<div class="panel hidden" id="shareBanner" style="background:var(--infobg);border-color:var(--info);margin-top:12px">
+  <div style="display:flex;align-items:flex-start;gap:10px">
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:600;color:var(--info);margin-bottom:4px">Help de simulatie verbeteren</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.5">Deel je anonieme voorkeurslijst (alleen schooladvies + schoolkeuzes, geen persoonlijke gegevens). Hoe meer lijsten we verzamelen, hoe beter het model de doorschuifpatronen tussen scholen kan voorspellen.</div>
+    </div>
+    <div style="display:flex;gap:6px;flex-shrink:0;align-self:center">
+      <button class="btn-acc" onclick="submitShareList()" id="shareBtn" style="font-size:12px;padding:5px 12px">Ja, deel mijn lijst</button>
+      <button onclick="dismissShare()" style="font-size:12px;padding:5px 8px;color:var(--ink3)">Nee</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ================================================================
 // DEPARTMENT DATA — pipe-delimited for compactness
@@ -471,7 +485,7 @@ const PRESETS=[
 // ================================================================
 // STATE
 // ================================================================
-let curAdvies='h';
+let curAdvies='';
 let prefIds=[];   // ordered list of dept IDs
 let allFT=[];     // fillTimes from simulation runs
 let simRunning=false;
@@ -487,8 +501,9 @@ function getDepts(){return RAW.filter(d=>d.acc.split(',').includes(curAdvies));}
 // UI: Advies selector
 // ================================================================
 const advSel=document.getElementById('advies');
+const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Kies je schooladvies\u2026';placeholder.disabled=true;placeholder.selected=true;
+advSel.appendChild(placeholder);
 ADVIES.forEach(a=>{const o=document.createElement('option');o.value=a.code;o.textContent=a.label;advSel.appendChild(o);});
-advSel.value='h';
 advSel.addEventListener('change',()=>{curAdvies=advSel.value;prefIds=[];tempCalibrated=false;resetSim();renderAll();});
 
 // ================================================================
@@ -861,6 +876,9 @@ function renderValidation(){
 }
 
 function renderAll(){
+  const hasAdvies=curAdvies&&getAdviesObj();
+  document.getElementById('prefPanel').classList.toggle('hidden',!hasAdvies);
+  if(!hasAdvies){document.getElementById('simPanel').classList.add('hidden');return;}
   updateSchoolDropdown();
   renderPrefList();
   renderListInfo();
@@ -1048,7 +1066,7 @@ function runSimLoop(){
   renderSim();
   renderSimStatus();
   if(runsComplete<N_RUNS)setTimeout(runSimLoop,0);
-  else{simRunning=false;renderValidation();}
+  else{simRunning=false;renderValidation();maybeShowShare();}
 }
 
 document.getElementById('sl').addEventListener('input',()=>{stopAnim();renderSim();});
@@ -1178,7 +1196,7 @@ async function saveList(){
   document.getElementById('saveStatus').textContent='';
   document.getElementById('saveModal').classList.add('open');
   // Also try silent storage save
-  try{await window.storage.set('loting_config',txt);
+  try{localStorage.setItem('loting_config',txt);
     setStatus('saveStatus','ok','✓ Automatisch opgeslagen in browser-opslag.');
   }catch(e){}
 }
@@ -1196,7 +1214,7 @@ async function copySaveText(){
 }
 async function doStorageSave(){
   const txt=document.getElementById('saveText').value;
-  try{await window.storage.set('loting_config',txt);setStatus('saveStatus','ok','✓ Opgeslagen in browser-opslag!');}
+  try{localStorage.setItem('loting_config',txt);setStatus('saveStatus','ok','✓ Opgeslagen in browser-opslag!');}
   catch(e){setStatus('saveStatus','err','Browser-opslag niet beschikbaar. Kopieer de tekst als alternatief.');}
 }
 
@@ -1207,9 +1225,9 @@ async function loadList(){
   document.getElementById('loadModal').classList.add('open');
   // Pre-fill from storage if available
   try{
-    const r=await window.storage.get('loting_config');
-    if(r&&r.value){
-      document.getElementById('loadText').value=r.value;
+    const v=localStorage.getItem('loting_config');
+    if(v){
+      document.getElementById('loadText').value=v;
       setStatus('loadStatus','info','Lijst gevonden in browser-opslag — klik "Laden uit tekstveld" om toe te passen.');
     }
   }catch(e){}
@@ -1231,9 +1249,9 @@ function applyLoadText(){
 }
 async function doStorageLoad(){
   try{
-    const r=await window.storage.get('loting_config');
-    if(r&&r.value){
-      document.getElementById('loadText').value=r.value;
+    const v=localStorage.getItem('loting_config');
+    if(v){
+      document.getElementById('loadText').value=v;
       setStatus('loadStatus','ok','✓ Geladen uit browser-opslag — klik "Laden uit tekstveld" om toe te passen.');
     }else{setStatus('loadStatus','err','Geen opgeslagen lijst gevonden in browser-opslag.');}
   }catch(e){setStatus('loadStatus','err','Browser-opslag niet beschikbaar.');}
@@ -1271,6 +1289,42 @@ function closePresetModal(){
 document.getElementById('presetModal').addEventListener('click',function(e){
   if(e.target===this)closePresetModal();
 });
+
+// ================================================================
+// ANONYMOUS LIST SHARING (opt-in)
+// ================================================================
+const SHARE_ENDPOINT='/api/submit-list'; // Vercel serverless function
+let shareShown=false;
+let shareDismissed=false;
+
+function maybeShowShare(){
+  // Show once per session after simulation completes, if not already dismissed
+  if(shareShown||shareDismissed||!prefIds.length||!allFT.length)return;
+  shareShown=true;
+  document.getElementById('shareBanner').classList.remove('hidden');
+}
+
+function dismissShare(){
+  shareDismissed=true;
+  document.getElementById('shareBanner').classList.add('hidden');
+}
+
+async function submitShareList(){
+  const btn=document.getElementById('shareBtn');
+  btn.disabled=true;btn.textContent='Verzenden\u2026';
+  const payload={advies:curAdvies,list:prefIds,ts:Date.now()};
+  try{
+    const res=await fetch(SHARE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(res.ok){
+      document.getElementById('shareBanner').classList.add('hidden');
+      showToast('\u2713 Bedankt! Je lijst is anoniem gedeeld.');
+    }else{
+      btn.textContent='Fout — probeer later opnieuw';btn.disabled=false;
+    }
+  }catch(e){
+    btn.textContent='Geen verbinding';btn.disabled=false;
+  }
+}
 
 // ================================================================
 // INIT
