@@ -1292,24 +1292,24 @@ function computeBreakpoints(){
     while(nextThr<thresholds.length&&p1Pct<=thresholds[nextThr]){
       // Only add if we haven't already added a breakpoint at this lot number
       if(!bps.length||bps[bps.length-1].lot!==lot){
-        const thr=thresholds[nextThr];
-        const lbl=thr>=99?firstName+': niet meer 100%':firstName+': '+thr+'% kans';
+        const thr=thresholds[nextThr];const _e=curLang==='en';
+        const lbl=thr>=99?firstName+': '+(_e?'no longer 100%':'niet meer 100%'):firstName+': '+thr+'% '+(_e?'chance':'kans');
         bps.push({lot,label:lbl});
       }
       nextThr++;
     }
     // Check top-school transitions
     if(maxI!==prevTopIdx){
-      const name=maxI>=0?(RAW.find(d=>d.id===prefIds[maxI])?.n||'?'):'ongeplaatst';
+      const name=maxI>=0?(RAW.find(d=>d.id===prefIds[maxI])?.n||'?'):(curLang==='en'?'unplaced':'ongeplaatst');
       if(prevTopIdx===-1){
-        bps.push({lot:1,label:'Meest waarschijnlijk: '+name});
+        bps.push({lot:1,label:(curLang==='en'?'Most likely: ':'Meest waarschijnlijk: ')+name});
       }else{
         bps.push({lot,label:'\u2192 '+name});
       }
       prevTopIdx=maxI;
     }
   }
-  bps.push({lot:N_TOTAL,label:'Ongunstigst'});
+  bps.push({lot:N_TOTAL,label:curLang==='en'?'Worst case':'Ongunstigst'});
   // Sort by lot number and deduplicate positions that are very close
   bps.sort((a,b)=>a.lot-b.lot);
   return bps;
