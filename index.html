@@ -363,13 +363,15 @@ details.meth{padding:10px 12px}
   </div>
 </div>
 
-<!-- SHARE OPT-IN GATE (shown between list completion and simulation) -->
-<div class="panel hidden" id="shareGate" style="border-color:var(--acc);text-align:center;padding:20px 18px">
-  <div style="font-family:'Newsreader',Georgia,serif;font-size:17px;font-weight:700;margin-bottom:6px" data-i18n="shareTitle">Je lijst is compleet!</div>
-  <div style="font-size:13px;color:var(--ink2);line-height:1.6;max-width:480px;margin:0 auto 14px" data-i18n="shareDesc">Wil je je voorkeurslijst anoniem delen om dit model te verbeteren? Er worden geen persoonsgegevens verzameld — alleen je schooladvies en schoolkeuzes. Hoe meer lijsten, hoe beter het model de doorschuifpatronen tussen scholen kan voorspellen.</div>
-  <div style="display:flex;gap:8px;justify-content:center">
-    <button class="btn-acc" onclick="respondShare(true)" style="padding:8px 20px" data-i18n="shareYes">Ja, deel mijn lijst</button>
-    <button onclick="respondShare(false)" style="padding:8px 16px" data-i18n="shareNo">Nee bedankt</button>
+<!-- SHARE OPT-IN GATE (modal) -->
+<div class="modal-bg" id="shareGate">
+  <div class="modal" style="text-align:center">
+    <div style="font-family:'Newsreader',Georgia,serif;font-size:18px;font-weight:700;margin-bottom:8px" data-i18n="shareTitle">Je lijst is compleet!</div>
+    <div style="font-size:14px;color:var(--ink2);line-height:1.6;max-width:480px;margin:0 auto 16px" data-i18n="shareDesc">Wil je je voorkeurslijst anoniem delen om dit model te verbeteren? Er worden geen persoonsgegevens verzameld — alleen je schooladvies en schoolkeuzes. Hoe meer lijsten, hoe beter het model de doorschuifpatronen tussen scholen kan voorspellen.</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn-acc" onclick="respondShare(true)" style="padding:8px 20px" data-i18n="shareYes">Ja, deel mijn lijst</button>
+      <button onclick="respondShare(false)" style="padding:8px 16px" data-i18n="shareNo">Nee bedankt</button>
+    </div>
   </div>
 </div>
 
@@ -1153,11 +1155,11 @@ function renderAll(){
   const listReady=prefIds.length>=getAdviesObj().listReq;
   const gate=document.getElementById('shareGate');
   if(listReady&&shareConsent===null&&!simRunning){
-    // Show opt-in gate before simulation
-    gate.classList.remove('hidden');
+    // Show opt-in gate as modal
+    gate.classList.add('open');
     document.getElementById('simPanel').classList.add('hidden');
   }else{
-    gate.classList.add('hidden');
+    gate.classList.remove('open');
     document.getElementById('simPanel').classList.toggle('hidden',!listReady);
     if(listReady&&!simRunning)startSim();
     else if(listReady){renderSim();renderValidation();}
@@ -1580,6 +1582,9 @@ function respondShare(agreed){
   shareConsent=agreed;
   renderAll(); // hides gate, starts simulation
 }
+document.getElementById('shareGate').addEventListener('click',function(e){
+  if(e.target===this)respondShare(false);
+});
 
 function submitShareList(){
   if(!shareConsent||!prefIds.length)return;
