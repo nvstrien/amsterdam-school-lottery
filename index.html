@@ -986,16 +986,50 @@ function renderSim(){
 
   const container=document.createElement('div');
 
-  // 1. Oversubscribed count
+  // 1. Oversubscribed count + label explanation + caveat
+  const nBalanced=prefIds.filter(pid=>{const d=RAW.find(x=>x.id===pid);if(!d)return false;const r=d.v1/d.cap;return r>=.85&&r<=1;}).length;
+  const nUnder=prefIds.filter(pid=>{const d=RAW.find(x=>x.id===pid);return d&&d.v1/d.cap<.7;}).length;
+
   const overLine=document.createElement('div');
-  overLine.style.cssText='margin-bottom:6px';
+  overLine.style.cssText='margin-bottom:8px';
   const overB=document.createElement('b');
   overB.textContent=_e?'List composition: ':'Lijstsamenstelling: ';
   overLine.appendChild(overB);
   overLine.appendChild(document.createTextNode(
-    _e?`${nOver} of ${nP} schools on your list have more 1st preferences than capacity.`
-      :`${nOver} van de ${nP} scholen op je lijst hebben meer 1e voorkeuren dan capaciteit.`));
+    _e?`${nOver} of ${nP} schools on your list have more 1st preferences than capacity`
+      :`${nOver} van de ${nP} scholen op je lijst hebben meer 1e voorkeuren dan capaciteit`));
+  if(nBalanced>0||nUnder>0){
+    const parts=[];
+    if(nBalanced>0)parts.push(_e?`${nBalanced} balanced`:`${nBalanced} in balans`);
+    if(nUnder>0)parts.push(_e?`${nUnder} with more capacity than demand`:`${nUnder} met meer plek dan vraag`);
+    overLine.appendChild(document.createTextNode(', '+parts.join(_e?' and ':' en ')+'.'));
+  }else{
+    overLine.appendChild(document.createTextNode('.'));
+  }
   container.appendChild(overLine);
+
+  // Label explanation
+  const legendLine=document.createElement('div');
+  legendLine.style.cssText='margin-bottom:8px;font-size:12px;color:var(--ink3)';
+  const legendSpans=_e
+    ?'<span class="tag tag-hot" style="font-size:11px">More demand than capacity</span> = more 1st preferences than places. '
+     +'<span class="tag tag-neut" style="font-size:11px">Demand and capacity balanced</span> = approximately equal. '
+     +'<span class="tag tag-ok" style="font-size:11px">More places than demand</span> = fewer 1st preferences than places.'
+    :'<span class="tag tag-hot" style="font-size:11px">Meer vraag dan plek</span> = meer 1e voorkeuren dan capaciteit. '
+     +'<span class="tag tag-neut" style="font-size:11px">Vraag en plek in balans</span> = ongeveer gelijk. '
+     +'<span class="tag tag-ok" style="font-size:11px">Meer plek dan vraag</span> = minder 1e voorkeuren dan capaciteit.';
+  const legendDiv=document.createElement('div');
+  legendDiv.innerHTML=legendSpans;
+  legendLine.appendChild(legendDiv);
+  container.appendChild(legendLine);
+
+  // Data caveat
+  const caveatLine=document.createElement('div');
+  caveatLine.style.cssText='margin-bottom:8px;font-size:13px;font-style:italic;color:var(--ink4)';
+  caveatLine.textContent=_e
+    ?'These labels are based on 2025 data. Demand for schools can shift from year to year due to open days, reputation changes, and other factors. Use as an indication, not a certainty.'
+    :'Deze labels zijn gebaseerd op gegevens uit 2025. De vraag naar scholen kan van jaar tot jaar verschuiven door open dagen, reputatieveranderingen en andere factoren. Gebruik als indicatie, niet als zekerheid.';
+  container.appendChild(caveatLine);
 
   // 2. Unplaced estimate with caveat
   if(pUnplaced>=.003){
