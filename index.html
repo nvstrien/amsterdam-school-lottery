@@ -225,7 +225,7 @@ details.meth{padding:10px 12px}
     <th style="min-width:140px;padding-left:6px">Plaatsingskans</th><th class="r" style="width:36px">Cum</th>
   </tr></thead><tbody id="tb"></tbody></table></div>
   <div class="note" id="simNote" style="display:none"><b>&plusmn;</b> = weinig historische data (< 5 eerstevoorkeuren) — schatting is indicatief. <b>~</b> = onzekere kansschatting.</div>
-  <div class="note" id="unplacedWarn" style="display:none;background:var(--warnbg,#fff3cd);border-left:3px solid var(--warn,#e67700);padding:10px 12px;margin-top:8px;border-radius:4px;font-size:12px;line-height:1.5"></div>
+  <div class="note" id="unplacedWarn" style="display:none;background:var(--warnbg,#fff3cd);border-left:3px solid var(--warn,#e67700);padding:12px 14px;margin-top:10px;border-radius:4px;font-size:14px;line-height:1.6"></div>
   <div id="analyticalPanel"></div>
   <div id="validationPanel"></div>
 </div>
@@ -418,7 +418,7 @@ const EN={
   recalBtn:'Recalibrate',recalTitle:'Recalibrate the model against 2025 data. Takes ~30 seconds but may improve accuracy.',
   pctGood:'top %d% \u2014 favourable',pctAbove:'top %d% \u2014 above average',
   pctMid:'around the median',pctBelow:'percentile %d \u2014 below average',pctBad:'percentile %d \u2014 unfavourable',
-  tagHot:'Oversubscribed',tagOk:'Undersubscribed',tagIntake:'Intake',
+  tagHot:'More demand than places',tagOk:'More places than demand',tagIntake:'Intake',
   disclaimer:'Disclaimer \u2014 This is an indicative simulation model based on public data (L&M 2025 report, 2026 capacity plan). The actual outcome depends on the preference lists of all ~7,650 participants, which will only be known in April 2026. Use this tool as a guideline, not a prediction.',
   animPrev:'Previous transition',animPlay:'Play',animNext:'Next transition',
   themeTitle:'Switch between light and dark theme',langTitle:'Schakel naar Nederlands',
@@ -736,8 +736,8 @@ function renderAcList(items){
     const tag=document.createElement('span');
     tag.className='tag';
     if(d.intake){tag.className+=' tag-int';tag.textContent=curLang==='en'?'Intake':'Intake';}
-    else if(ratio>1){tag.className+=' tag-hot';tag.textContent=curLang==='en'?'Oversubscribed':'Overaangemeld';}
-    else if(ratio<.7){tag.className+=' tag-ok';tag.textContent=curLang==='en'?'Undersubscribed':'Onderbezet';}
+    else if(ratio>1){tag.className+=' tag-hot';tag.textContent=curLang==='en'?'More demand than places':'Meer gewild dan plek';}
+    else if(ratio<.7){tag.className+=' tag-ok';tag.textContent=curLang==='en'?'More places than demand':'Meer plek dan vraag';}
     const meta=document.createElement('span');meta.className='ac-item-meta';
     meta.textContent=d.cap+' pl.';
     div.append(name);
@@ -826,8 +826,8 @@ function renderPrefList(){
     let tag='';
     const _e=curLang==='en';
     if(d.intake)tag+='<span class="tag tag-int">Intake</span>';
-    if(ratio>1)tag+='<span class="tag tag-hot">'+(_e?'Oversubscribed':'Overaangemeld')+'</span>';
-    else if(ratio<.7)tag+='<span class="tag tag-ok">'+(_e?'Undersubscribed':'Onderbezet')+'</span>';
+    if(ratio>1)tag+='<span class="tag tag-hot">'+(_e?'More demand than places':'Meer gewild dan plek')+'</span>';
+    else if(ratio<.7)tag+='<span class="tag tag-ok">'+(_e?'More places than demand':'Meer plek dan vraag')+'</span>';
     const div=document.createElement('div');div.className='pref-item';
     div.innerHTML=`<span class="pref-rk">${i+1}</span><span class="pref-name">${d.n}${tag}</span><span class="pref-cap">${d.cap}</span><div class="pref-btns"><button class="btn-sm" onclick="moveUp(${i})" ${i===0?'disabled':''}>▲</button><button class="btn-sm" onclick="moveDown(${i})" ${i===prefIds.length-1?'disabled':''}>▼</button><button class="btn-sm btn-danger" onclick="removeSchool(${i})">✕</button></div>`;
     el.appendChild(div);
@@ -965,7 +965,7 @@ function renderSim(){
     const ratio=d.v1/d.cap;
     let tag='';if(d.intake)tag+='<span class="tag tag-int">Intake</span>';
     if(approx)tag+='<span class="tag" style="background:var(--warnbg);color:var(--warn)" title="Weinig historische data — schatting onzeker">&plusmn;</span>';
-    if(ratio>1)tag+='<span class="tag tag-hot">Overaangemeld</span>';else if(ratio<.7)tag+='<span class="tag tag-ok">Onderbezet</span>';
+    if(ratio>1)tag+='<span class="tag tag-hot">Meer gewild dan plek</span>';else if(ratio<.7)tag+='<span class="tag tag-ok">Meer plek dan vraag</span>';
     const isTop=i===maxI;
     const tr=document.createElement('tr');if(isTop)tr.className='row-top';
     tr.innerHTML=`<td class="col-rk">${i+1}</td><td class="col-nm">${d.n}${tag}</td><td class="col-n">${d.cap}</td><td class="bar-c"><div class="bw"><span class="bt"><span class="bf" style="width:${bw}%;background:${bc}"></span></span><span class="bp ${cc}">${disp}</span></div></td><td class="col-n" style="color:var(--ink4)">${cPct}%</td>`;
@@ -989,8 +989,8 @@ function renderSim(){
   overB.textContent=_e?'List composition: ':'Lijstsamenstelling: ';
   overLine.appendChild(overB);
   overLine.appendChild(document.createTextNode(
-    _e?`${nOver} of ${nP} schools on your list are oversubscribed (more 1st preferences than capacity).`
-      :`${nOver} van de ${nP} scholen op je lijst zijn overaangemeld (meer 1e voorkeuren dan capaciteit).`));
+    _e?`${nOver} of ${nP} schools on your list have more 1st preferences than capacity.`
+      :`${nOver} van de ${nP} scholen op je lijst hebben meer 1e voorkeuren dan capaciteit.`));
   container.appendChild(overLine);
 
   // 2. Unplaced estimate with caveat
@@ -1004,7 +1004,7 @@ function renderSim(){
       _e?`${pPct}% chance of not being placed in round 1 at this lottery number. `
         :`${pPct}% kans om niet in ronde 1 geplaatst te worden bij dit lotnummer. `));
     const caveat=document.createElement('span');
-    caveat.style.cssText='color:var(--ink4);font-size:11px';
+    caveat.style.cssText='color:var(--ink4);font-size:13px;font-style:italic';
     caveat.textContent=_e
       ?'Note: the model assumes uniform preferences across the city. In practice, students from the same area tend to prefer the same schools, so the real risk for clustered lists may be higher than shown.'
       :'Let op: het model gaat uit van gelijkmatig verdeelde voorkeuren. In werkelijkheid kiezen leerlingen uit dezelfde buurt vaak dezelfde scholen, waardoor het werkelijke risico bij geclusterde lijsten hoger kan zijn dan hier getoond.';
@@ -1020,8 +1020,8 @@ function renderSim(){
     advB.textContent=_e?'Tip: ':'Tip: ';
     advLine.appendChild(advB);
     advLine.appendChild(document.createTextNode(
-      _e?'Most schools on your list are oversubscribed. Consider whether there are schools with available capacity that your child might also enjoy. This does not mean you should change your order \u2014 always list schools in your true order of preference. The algorithm tries each school for you at no cost; skipping a school only reduces your chances.'
-        :'De meeste scholen op je lijst zijn overaangemeld. Overweeg of er scholen met beschikbare capaciteit zijn waar je kind het ook naar zijn zin zou hebben. Dit betekent niet dat je de volgorde moet aanpassen \u2014 vul altijd je oprechte voorkeur in. Het algoritme probeert elke school voor je zonder consequentie; een school weglaten verkleint alleen je kans.'));
+      _e?'Most schools on your list have more 1st preferences than capacity. Consider whether there are schools with available capacity that your child might also enjoy. This does not mean you should change your order \u2014 always list schools in your true order of preference. The algorithm tries each school for you at no cost; skipping a school only reduces your chances.'
+        :'De meeste scholen op je lijst hebben meer 1e voorkeuren dan capaciteit. Overweeg of er scholen met beschikbare capaciteit zijn waar je kind het ook naar zijn zin zou hebben. Dit betekent niet dat je de volgorde moet aanpassen \u2014 vul altijd je oprechte voorkeur in. Het algoritme probeert elke school voor je zonder consequentie; een school weglaten verkleint alleen je kans.'));
     advLine.appendChild(document.createElement('br'));
     advLine.appendChild(document.createElement('br'));
     const stratB=document.createElement('b');
@@ -1090,7 +1090,7 @@ function renderAnalytical(){
     +'<p style="margin-top:8px">Verwachte vraag op basis van Plackett-Luce model ('+LL+' posities, '+N+' leerlingen, '+poolDepts.length+' afdelingen).</p>'
     +'<table style="width:100%;margin-top:6px"><thead><tr><th style="text-align:left">School</th><th class="r">Cap</th><th class="r">V1</th><th class="r">V1/Cap</th><th class="r">Op lijst</th><th class="r">Ratio</th><th class="r">Vol bij</th></tr></thead><tbody>'
     +trs+'</tbody></table>'
-    +'<p style="margin-top:4px;font-size:10px;color:var(--ink4)"><b>V1/Cap</b> = eerstevoorkeuren vs capaciteit (>1x = overaangemeld uit 1e voorkeur alleen). <b>Op lijst</b> = geschat aantal leerlingen dat deze school ergens op de lijst heeft. <b>Vol bij</b> = geschat lotnummerpercentiel waarop de afdeling volraakt (exclusief cascade-effecten).</p>'
+    +'<p style="margin-top:4px;font-size:10px;color:var(--ink4)"><b>V1/Cap</b> = eerstevoorkeuren vs capaciteit (>1x = meer gewild dan plek uit 1e voorkeur alleen). <b>Op lijst</b> = geschat aantal leerlingen dat deze school ergens op de lijst heeft. <b>Vol bij</b> = geschat lotnummerpercentiel waarop de afdeling volraakt (exclusief cascade-effecten).</p>'
     +'</details>';
 }
 
