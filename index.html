@@ -225,6 +225,7 @@ details.meth{padding:10px 12px}
     <th style="min-width:140px;padding-left:6px">Plaatsingskans</th><th class="r" style="width:36px">Cum</th>
   </tr></thead><tbody id="tb"></tbody></table></div>
   <div class="note" id="simNote" style="display:none"><b>&plusmn;</b> = weinig historische data (< 5 eerstevoorkeuren) — schatting is indicatief. <b>~</b> = onzekere kansschatting.</div>
+  <div class="note" id="unplacedWarn" style="display:none;background:var(--warnbg,#fff3cd);border-left:3px solid var(--warn,#e67700);padding:10px 12px;margin-top:8px;border-radius:4px"></div>
   <div id="analyticalPanel"></div>
   <div id="validationPanel"></div>
 </div>
@@ -657,6 +658,8 @@ const POOLS={
 
 // Preset lists per advies type
 const PRESETS=[
+  {advies:'h', label:'Havo — voorbeeld geclustered (alleen populaire scholen)',
+   ids:[49,144,135,108,56,152,102,142,80,100,32,6]},
   {advies:'h', label:'Havo — voorbeeld gemengde lijst',
    ids:[49,32,100,56,131,52,58,89,104,21,41,60]},
   {advies:'v', label:'VWO — voorbeeld populaire gymnasia + lycea',
@@ -926,10 +929,11 @@ function renderSim(){
   const pool=getPool();
   const P=Math.round((lotNum-1)/(N_TOTAL-1)*(pool.size-1));
   const nP=prefIds.length;
-  const counts=new Uint32Array(nP);let total=0;
-  for(let r=0;r<allFT.length;r++){const k=queryPlacement(allFT[r],P,nP);if(k>=0)counts[k]++;total++;}
+  const counts=new Uint32Array(nP);let total=0;let unplaced=0;
+  for(let r=0;r<allFT.length;r++){const k=queryPlacement(allFT[r],P,nP);if(k>=0)counts[k]++;else unplaced++;total++;}
   if(!total)total=1;
   const probs=Array.from({length:nP},(_,i)=>counts[i]/total);
+  const pUnplaced=unplaced/total;
 
   // Stats
   const fmt=v=>v<.003?'<1%':(v*100).toFixed(1)+'%';
@@ -944,7 +948,7 @@ function renderSim(){
     <div class="s"><div class="s-val ${cls(p3)}">${fmt(p3)}</div><div class="s-lbl">${_e?'Chance top 3':'Kans top 3'}</div></div>
     <div class="s"><div class="s-val ${cls(p5)}">${fmt(p5)}</div><div class="s-lbl">${_e?'Chance top 5':'Kans top 5'}</div></div>
     <div class="s"><div class="s-val" style="font-size:15px">${topName.length>22?topName.slice(0,21)+'\u2026':topName}</div><div class="s-lbl">${_e?'Most likely':'Meest waarschijnlijk'}</div></div>
-    <div class="s"><div class="s-val">${runsComplete.toLocaleString('nl-NL')}</div><div class="s-lbl">${_e?'Iterations':'Iteraties'}</div></div>`;
+    <div class="s"><div class="s-val ${pUnplaced>=.05?'c-bad':pUnplaced>=.01?'c-warn':'c-good'}">${fmt(pUnplaced)}</div><div class="s-lbl">${_e?'Not placed round 1':'Niet geplaatst ronde 1'}</div></div>`;
 
   // Table
   const tb=document.getElementById('tb');tb.innerHTML='';
@@ -970,6 +974,34 @@ function renderSim(){
   // Show uncertainty footnote if any small-data school is in the list
   const hasApprox=prefIds.some(pid=>{const d=RAW.find(x=>x.id===pid);return d&&d.v1<5;});
   document.getElementById('simNote').style.display=hasApprox?'block':'none';
+
+  // Unplaced warning — all values are computed numbers, no user input
+  const uw=document.getElementById('unplacedWarn');
+  if(pUnplaced>=.01){
+    const pPct=(pUnplaced*100).toFixed(1);
+    const nOver=prefIds.filter(pid=>{const d=RAW.find(x=>x.id===pid);return d&&d.v1/d.cap>1;}).length;
+    const warn=document.createElement('div');
+    const b1=document.createElement('b');
+    b1.textContent=_e?'Note: ':'Let op: ';
+    warn.appendChild(b1);
+    const msg=_e
+      ?`With this list and lottery number, there is a ${pPct}% chance of not being placed in round 1. `
+      :`Met deze lijst en dit lotnummer is er ${pPct}% kans dat je niet in ronde 1 geplaatst wordt. `;
+    warn.appendChild(document.createTextNode(msg));
+    if(nOver>=nP-2){
+      const advice=_e
+        ?`Most schools on your list (${nOver}/${nP}) are oversubscribed. Consider adding schools with available capacity to reduce this risk.`
+        :`De meeste scholen op je lijst (${nOver}/${nP}) zijn overaangemeld. Overweeg om scholen met beschikbare capaciteit toe te voegen.`;
+      warn.appendChild(document.createTextNode(advice));
+    }else{
+      warn.appendChild(document.createTextNode(_e?`${nOver} of ${nP} schools on your list are oversubscribed.`:`${nOver} van de ${nP} scholen op je lijst zijn overaangemeld.`));
+    }
+    uw.textContent='';
+    uw.appendChild(warn);
+    uw.style.display='block';
+  }else{
+    uw.style.display='none';
+  }
 }
 
 function renderEmptyTable(){
