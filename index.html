@@ -50,7 +50,7 @@ button:hover{background:var(--inset)}
 .list-info{font-size:12px;color:var(--ink3);margin-top:6px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
 .list-info .ok{color:var(--good)}.list-info .nok{color:var(--bad)}
 .tag{display:inline-block;font-size:9px;font-weight:600;padding:1px 4px;border-radius:3px;margin-left:3px;vertical-align:middle;text-transform:uppercase;letter-spacing:.2px}
-.tag-hot{background:var(--badbg);color:var(--bad)}.tag-ok{background:var(--goodbg);color:var(--good)}.tag-int{background:var(--infobg);color:var(--info)}
+.tag-hot{background:var(--badbg);color:var(--bad)}.tag-neut{background:var(--warnbg);color:var(--warn)}.tag-ok{background:var(--goodbg);color:var(--good)}.tag-int{background:var(--infobg);color:var(--info)}
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--brd);border:1px solid var(--brd);border-radius:10px;overflow:hidden;margin-bottom:12px}
 .s{background:var(--card);padding:12px 14px}
@@ -420,7 +420,7 @@ const EN={
   recalBtn:'Recalibrate',recalTitle:'Recalibrate the model against 2025 data. Takes ~30 seconds but may improve accuracy.',
   pctGood:'top %d% \u2014 favourable',pctAbove:'top %d% \u2014 above average',
   pctMid:'around the median',pctBelow:'percentile %d \u2014 below average',pctBad:'percentile %d \u2014 unfavourable',
-  tagHot:'More demand than places',tagOk:'More places than demand',tagIntake:'Intake',
+  tagHot:'More demand than capacity',tagOk:'More places than demand',tagIntake:'Intake',
   disclaimer:'Disclaimer \u2014 This is an indicative simulation model based on public data (L&M 2025 report, 2026 capacity plan). The actual outcome depends on the preference lists of all ~7,650 participants, which will only be known in April 2026. Use this tool as a guideline, not a prediction.',
   animPrev:'Previous transition',animPlay:'Play',animNext:'Next transition',
   themeTitle:'Switch between light and dark theme',langTitle:'Schakel naar Nederlands',
@@ -738,7 +738,8 @@ function renderAcList(items){
     const tag=document.createElement('span');
     tag.className='tag';
     if(d.intake){tag.className+=' tag-int';tag.textContent=curLang==='en'?'Intake':'Intake';}
-    else if(ratio>1){tag.className+=' tag-hot';tag.textContent=curLang==='en'?'More demand than places':'Meer gewild dan plek';}
+    else if(ratio>1){tag.className+=' tag-hot';tag.textContent=curLang==='en'?'More demand than capacity':'Meer vraag dan plek';}
+    else if(ratio>=.85){tag.className+=' tag-neut';tag.textContent=curLang==='en'?'Demand and capacity balanced':'Vraag en plek in balans';}
     else if(ratio<.7){tag.className+=' tag-ok';tag.textContent=curLang==='en'?'More places than demand':'Meer plek dan vraag';}
     const meta=document.createElement('span');meta.className='ac-item-meta';
     meta.textContent=d.cap+' pl.';
@@ -828,7 +829,8 @@ function renderPrefList(){
     let tag='';
     const _e=curLang==='en';
     if(d.intake)tag+='<span class="tag tag-int">Intake</span>';
-    if(ratio>1)tag+='<span class="tag tag-hot">'+(_e?'More demand than places':'Meer gewild dan plek')+'</span>';
+    if(ratio>1)tag+='<span class="tag tag-hot">'+(_e?'More demand than capacity':'Meer vraag dan plek')+'</span>';
+    else if(ratio>=.85)tag+='<span class="tag tag-neut">'+(_e?'Demand and capacity balanced':'Vraag en plek in balans')+'</span>';
     else if(ratio<.7)tag+='<span class="tag tag-ok">'+(_e?'More places than demand':'Meer plek dan vraag')+'</span>';
     const div=document.createElement('div');div.className='pref-item';
     div.innerHTML=`<span class="pref-rk">${i+1}</span><span class="pref-name">${d.n}${tag}</span><span class="pref-cap">${d.cap}</span><div class="pref-btns"><button class="btn-sm" onclick="moveUp(${i})" ${i===0?'disabled':''}>▲</button><button class="btn-sm" onclick="moveDown(${i})" ${i===prefIds.length-1?'disabled':''}>▼</button><button class="btn-sm btn-danger" onclick="removeSchool(${i})">✕</button></div>`;
@@ -967,7 +969,7 @@ function renderSim(){
     const ratio=d.v1/d.cap;
     let tag='';if(d.intake)tag+='<span class="tag tag-int">Intake</span>';
     if(approx)tag+='<span class="tag" style="background:var(--warnbg);color:var(--warn)" title="Weinig historische data — schatting onzeker">&plusmn;</span>';
-    if(ratio>1)tag+='<span class="tag tag-hot">Meer gewild dan plek</span>';else if(ratio<.7)tag+='<span class="tag tag-ok">Meer plek dan vraag</span>';
+    if(ratio>1)tag+='<span class="tag tag-hot">Meer vraag dan plek</span>';else if(ratio>=.85)tag+='<span class="tag tag-neut">Vraag en plek in balans</span>';else if(ratio<.7)tag+='<span class="tag tag-ok">Meer plek dan vraag</span>';
     const isTop=i===maxI;
     const tr=document.createElement('tr');if(isTop)tr.className='row-top';
     tr.innerHTML=`<td class="col-rk">${i+1}</td><td class="col-nm">${d.n}${tag}</td><td class="col-n">${d.cap}</td><td class="bar-c"><div class="bw"><span class="bt"><span class="bf" style="width:${bw}%;background:${bc}"></span></span><span class="bp ${cc}">${disp}</span></div></td><td class="col-n" style="color:var(--ink4)">${cPct}%</td>`;
