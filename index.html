@@ -225,7 +225,7 @@ details.meth{padding:10px 12px}
     <th style="min-width:140px;padding-left:6px">Plaatsingskans</th><th class="r" style="width:36px">Cum</th>
   </tr></thead><tbody id="tb"></tbody></table></div>
   <div class="note" id="simNote" style="display:none"><b>&plusmn;</b> = weinig historische data (< 5 eerstevoorkeuren) — schatting is indicatief. <b>~</b> = onzekere kansschatting.</div>
-  <div class="note" id="unplacedWarn" style="display:none;background:var(--warnbg,#fff3cd);border-left:3px solid var(--warn,#e67700);padding:10px 12px;margin-top:8px;border-radius:4px"></div>
+  <div class="note" id="unplacedWarn" style="display:none;background:var(--warnbg,#fff3cd);border-left:3px solid var(--warn,#e67700);padding:10px 12px;margin-top:8px;border-radius:4px;font-size:12px;line-height:1.5"></div>
   <div id="analyticalPanel"></div>
   <div id="validationPanel"></div>
 </div>
@@ -948,7 +948,7 @@ function renderSim(){
     <div class="s"><div class="s-val ${cls(p3)}">${fmt(p3)}</div><div class="s-lbl">${_e?'Chance top 3':'Kans top 3'}</div></div>
     <div class="s"><div class="s-val ${cls(p5)}">${fmt(p5)}</div><div class="s-lbl">${_e?'Chance top 5':'Kans top 5'}</div></div>
     <div class="s"><div class="s-val" style="font-size:15px">${topName.length>22?topName.slice(0,21)+'\u2026':topName}</div><div class="s-lbl">${_e?'Most likely':'Meest waarschijnlijk'}</div></div>
-    <div class="s"><div class="s-val ${pUnplaced>=.05?'c-bad':pUnplaced>=.01?'c-warn':'c-good'}">${fmt(pUnplaced)}</div><div class="s-lbl">${_e?'Not placed round 1':'Niet geplaatst ronde 1'}</div></div>`;
+    <div class="s"><div class="s-val">${runsComplete.toLocaleString('nl-NL')}</div><div class="s-lbl">${_e?'Iterations':'Iteraties'}</div></div>`;
 
   // Table
   const tb=document.getElementById('tb');tb.innerHTML='';
@@ -975,29 +975,67 @@ function renderSim(){
   const hasApprox=prefIds.some(pid=>{const d=RAW.find(x=>x.id===pid);return d&&d.v1<5;});
   document.getElementById('simNote').style.display=hasApprox?'block':'none';
 
-  // Unplaced warning — all values are computed numbers, no user input
+  // List analysis panel
   const uw=document.getElementById('unplacedWarn');
-  if(pUnplaced>=.01){
-    const pPct=(pUnplaced*100).toFixed(1);
-    const nOver=prefIds.filter(pid=>{const d=RAW.find(x=>x.id===pid);return d&&d.v1/d.cap>1;}).length;
-    const warn=document.createElement('div');
-    const b1=document.createElement('b');
-    b1.textContent=_e?'Note: ':'Let op: ';
-    warn.appendChild(b1);
-    const msg=_e
-      ?`With this list and lottery number, there is a ${pPct}% chance of not being placed in round 1. `
-      :`Met deze lijst en dit lotnummer is er ${pPct}% kans dat je niet in ronde 1 geplaatst wordt. `;
-    warn.appendChild(document.createTextNode(msg));
-    if(nOver>=nP-2){
-      const advice=_e
-        ?`Most schools on your list (${nOver}/${nP}) are oversubscribed. Consider adding schools with available capacity to reduce this risk.`
-        :`De meeste scholen op je lijst (${nOver}/${nP}) zijn overaangemeld. Overweeg om scholen met beschikbare capaciteit toe te voegen.`;
-      warn.appendChild(document.createTextNode(advice));
-    }else{
-      warn.appendChild(document.createTextNode(_e?`${nOver} of ${nP} schools on your list are oversubscribed.`:`${nOver} van de ${nP} scholen op je lijst zijn overaangemeld.`));
-    }
+  const nOver=prefIds.filter(pid=>{const d=RAW.find(x=>x.id===pid);return d&&d.v1/d.cap>1;}).length;
+  const pPct=(pUnplaced*100).toFixed(1);
+
+  const container=document.createElement('div');
+
+  // 1. Oversubscribed count
+  const overLine=document.createElement('div');
+  overLine.style.cssText='margin-bottom:6px';
+  const overB=document.createElement('b');
+  overB.textContent=_e?'List composition: ':'Lijstsamenstelling: ';
+  overLine.appendChild(overB);
+  overLine.appendChild(document.createTextNode(
+    _e?`${nOver} of ${nP} schools on your list are oversubscribed (more 1st preferences than capacity).`
+      :`${nOver} van de ${nP} scholen op je lijst zijn overaangemeld (meer 1e voorkeuren dan capaciteit).`));
+  container.appendChild(overLine);
+
+  // 2. Unplaced estimate with caveat
+  if(pUnplaced>=.003){
+    const upLine=document.createElement('div');
+    upLine.style.cssText='margin-bottom:6px';
+    const upB=document.createElement('b');
+    upB.textContent=_e?'Unplaced estimate: ':'Niet-geplaatst schatting: ';
+    upLine.appendChild(upB);
+    upLine.appendChild(document.createTextNode(
+      _e?`${pPct}% chance of not being placed in round 1 at this lottery number. `
+        :`${pPct}% kans om niet in ronde 1 geplaatst te worden bij dit lotnummer. `));
+    const caveat=document.createElement('span');
+    caveat.style.cssText='color:var(--ink4);font-size:11px';
+    caveat.textContent=_e
+      ?'Note: the model assumes uniform preferences across the city. In practice, students from the same area tend to prefer the same schools, so the real risk for clustered lists may be higher than shown.'
+      :'Let op: het model gaat uit van gelijkmatig verdeelde voorkeuren. In werkelijkheid kiezen leerlingen uit dezelfde buurt vaak dezelfde scholen, waardoor het werkelijke risico bij geclusterde lijsten hoger kan zijn dan hier getoond.';
+    upLine.appendChild(caveat);
+    container.appendChild(upLine);
+  }
+
+  // 3. Advice warning if heavily clustered
+  if(nOver>=Math.ceil(nP*0.7)){
+    const advLine=document.createElement('div');
+    advLine.style.cssText='margin-bottom:6px';
+    const advB=document.createElement('b');
+    advB.textContent=_e?'Tip: ':'Tip: ';
+    advLine.appendChild(advB);
+    advLine.appendChild(document.createTextNode(
+      _e?'Most schools on your list are oversubscribed. Consider whether there are schools with available capacity that your child might also enjoy. This does not mean you should change your order \u2014 always list schools in your true order of preference. The algorithm tries each school for you at no cost; skipping a school only reduces your chances.'
+        :'De meeste scholen op je lijst zijn overaangemeld. Overweeg of er scholen met beschikbare capaciteit zijn waar je kind het ook naar zijn zin zou hebben. Dit betekent niet dat je de volgorde moet aanpassen \u2014 vul altijd je oprechte voorkeur in. Het algoritme probeert elke school voor je zonder consequentie; een school weglaten verkleint alleen je kans.'));
+    advLine.appendChild(document.createElement('br'));
+    advLine.appendChild(document.createElement('br'));
+    const stratB=document.createElement('b');
+    stratB.textContent=_e?'Best strategy: ':'Beste strategie: ';
+    advLine.appendChild(stratB);
+    advLine.appendChild(document.createTextNode(
+      _e?'List your genuine preferences in your true order. Broadening your horizon for positions lower on the list can reduce the risk of not being placed in round 1.'
+        :'Vul je oprechte voorkeuren in, in je echte volgorde. Het verbreden van je blikveld voor de lagere posities op de lijst kan het risico op niet-plaatsing in ronde 1 verkleinen.'));
+    container.appendChild(advLine);
+  }
+
+  if(container.childNodes.length>0){
     uw.textContent='';
-    uw.appendChild(warn);
+    uw.appendChild(container);
     uw.style.display='block';
   }else{
     uw.style.display='none';
