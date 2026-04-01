@@ -225,7 +225,7 @@ details.meth{padding:10px 12px}
     <th style="min-width:140px;padding-left:6px">Plaatsingskans</th><th class="r" style="width:36px">Cum</th>
   </tr></thead><tbody id="tb"></tbody></table></div>
   <div class="note" id="simNote" style="display:none"><b>&plusmn;</b> = weinig historische data (< 5 eerstevoorkeuren) — schatting is indicatief. <b>~</b> = onzekere kansschatting.</div>
-  <div class="note" id="unplacedWarn" style="display:none;background:var(--warnbg,#fff3cd);border-left:3px solid var(--warn,#e67700);padding:12px 14px;margin-top:10px;border-radius:4px;font-size:14px;line-height:1.6"></div>
+  <div class="note" id="unplacedWarn" style="display:none;background:var(--card);border:1px solid var(--brd);padding:14px 16px;margin-top:10px;border-radius:8px;font-size:14px;line-height:1.6;color:var(--ink)"></div>
   <div id="analyticalPanel"></div>
   <div id="validationPanel"></div>
 </div>
@@ -1008,24 +1008,34 @@ function renderSim(){
   }
   container.appendChild(overLine);
 
-  // Label explanation
+  // Label explanation — each on its own line
   const legendLine=document.createElement('div');
-  legendLine.style.cssText='margin-bottom:8px;font-size:12px;color:var(--ink3)';
-  const legendSpans=_e
-    ?'<span class="tag tag-hot" style="font-size:11px">More demand than capacity</span> = more 1st preferences than places. '
-     +'<span class="tag tag-neut" style="font-size:11px">Demand and capacity balanced</span> = approximately equal. '
-     +'<span class="tag tag-ok" style="font-size:11px">More places than demand</span> = fewer 1st preferences than places.'
-    :'<span class="tag tag-hot" style="font-size:11px">Meer vraag dan plek</span> = meer 1e voorkeuren dan capaciteit. '
-     +'<span class="tag tag-neut" style="font-size:11px">Vraag en plek in balans</span> = ongeveer gelijk. '
-     +'<span class="tag tag-ok" style="font-size:11px">Meer plek dan vraag</span> = minder 1e voorkeuren dan capaciteit.';
-  const legendDiv=document.createElement('div');
-  legendDiv.innerHTML=legendSpans;
-  legendLine.appendChild(legendDiv);
+  legendLine.style.cssText='margin-bottom:8px;font-size:13px;color:var(--ink2)';
+  const labels=_e?[
+    ['tag-hot','More demand than capacity','more 1st preferences than places'],
+    ['tag-neut','Demand and capacity balanced','approximately equal'],
+    ['tag-ok','More places than demand','fewer 1st preferences than places']
+  ]:[
+    ['tag-hot','Meer vraag dan plek','meer 1e voorkeuren dan capaciteit'],
+    ['tag-neut','Vraag en plek in balans','ongeveer gelijk'],
+    ['tag-ok','Meer plek dan vraag','minder 1e voorkeuren dan capaciteit']
+  ];
+  labels.forEach(function(l){
+    const row=document.createElement('div');
+    row.style.cssText='margin-bottom:3px';
+    const span=document.createElement('span');
+    span.className='tag '+l[0];
+    span.style.fontSize='11px';
+    span.textContent=l[1];
+    row.appendChild(span);
+    row.appendChild(document.createTextNode(' = '+l[2]));
+    legendLine.appendChild(row);
+  });
   container.appendChild(legendLine);
 
   // Data caveat
   const caveatLine=document.createElement('div');
-  caveatLine.style.cssText='margin-bottom:8px;font-size:13px;font-style:italic;color:var(--ink4)';
+  caveatLine.style.cssText='margin-bottom:8px;font-size:13px;font-style:italic;color:var(--ink3)';
   caveatLine.textContent=_e
     ?'These labels are based on 2025 data. Demand for schools can shift from year to year due to open days, reputation changes, and other factors. Use as an indication, not a certainty.'
     :'Deze labels zijn gebaseerd op gegevens uit 2025. De vraag naar scholen kan van jaar tot jaar verschuiven door open dagen, reputatieveranderingen en andere factoren. Gebruik als indicatie, niet als zekerheid.';
@@ -1042,7 +1052,7 @@ function renderSim(){
       _e?`${pPct}% chance of not being placed in round 1 at this lottery number. `
         :`${pPct}% kans om niet in ronde 1 geplaatst te worden bij dit lotnummer. `));
     const caveat=document.createElement('span');
-    caveat.style.cssText='color:var(--ink4);font-size:13px;font-style:italic';
+    caveat.style.cssText='color:var(--ink3);font-size:13px;font-style:italic';
     caveat.textContent=_e
       ?'Note: the model assumes uniform preferences across the city. In practice, students from the same area tend to prefer the same schools, so the real risk for clustered lists may be higher than shown.'
       :'Let op: het model gaat uit van gelijkmatig verdeelde voorkeuren. In werkelijkheid kiezen leerlingen uit dezelfde buurt vaak dezelfde scholen, waardoor het werkelijke risico bij geclusterde lijsten hoger kan zijn dan hier getoond.';
